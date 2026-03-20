@@ -13,7 +13,7 @@ export default function CGVPage() {
     <>
       <PageHeader title="Conditions Générales de Vente" />
       <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl prose prose-invert prose-sm">
+        <div className="mx-auto max-w-3xl prose prose-neutral prose-sm">
           <h2>1. Objet</h2>
           <p>
             Les présentes conditions générales de vente régissent les relations contractuelles entre

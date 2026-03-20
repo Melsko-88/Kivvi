@@ -24,8 +24,8 @@ export default function AboutPage() {
       <SectionWrapper>
         <div className="mx-auto max-w-3xl">
           <ScrollReveal>
-            <h2 className="font-[family-name:var(--font-heading)] text-2xl font-bold mb-6">Notre Histoire</h2>
-            <div className="space-y-4 text-muted-foreground leading-relaxed">
+            <h2 className="font-[family-name:var(--font-heading)] text-2xl font-bold text-[#1A1A1A] mb-6">Notre Histoire</h2>
+            <div className="space-y-4 text-[#6B6B6B] leading-relaxed">
               <p>
                 KIVVI est née d&apos;un constat simple : les entreprises africaines méritent des solutions digitales
                 à la hauteur de leurs ambitions. Trop souvent, les agences proposent des services standardisés
@@ -48,12 +48,12 @@ export default function AboutPage() {
       </SectionWrapper>
 
       {/* Founder */}
-      <section className="py-20 bg-card/30 border-y border-border">
+      <section className="py-24 bg-[#F3F1EE]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="flex flex-col md:flex-row items-center gap-10 max-w-4xl mx-auto">
               <div className="shrink-0">
-                <div className="w-48 h-48 rounded-2xl overflow-hidden border-2 border-primary/20">
+                <div className="w-48 h-48 rounded-2xl overflow-hidden border-2 border-copper/20">
                   <Image
                     src={SITE_CONFIG.founder.photo}
                     alt={SITE_CONFIG.founder.name}
@@ -64,11 +64,11 @@ export default function AboutPage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-[family-name:var(--font-heading)] text-2xl font-bold mb-1">
+                <h3 className="font-[family-name:var(--font-heading)] text-2xl font-bold text-[#1A1A1A] mb-1">
                   {SITE_CONFIG.founder.name}
                 </h3>
-                <p className="text-primary font-medium mb-4">{SITE_CONFIG.founder.role}</p>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-copper font-medium mb-4">{SITE_CONFIG.founder.role}</p>
+                <p className="text-[#6B6B6B] leading-relaxed">
                   Passionné par la technologie et l&apos;innovation, Mbar Cheikh Philippe FAYE a fondé KIVVI
                   avec la conviction que l&apos;Afrique peut et doit être à la pointe du digital.
                   Avec une expertise en développement web, mobile et cloud, il accompagne chaque client
@@ -81,30 +81,26 @@ export default function AboutPage() {
       </section>
 
       {/* Mission / Vision / Values */}
-      <SectionWrapper title="Notre Mission">
+      <SectionWrapper title="Notre Mission" variant="dark">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {[
             {
               title: 'Mission',
               description: 'Rendre l\'excellence digitale accessible aux entreprises et institutions africaines, en proposant des solutions sur mesure, performantes et abordables.',
-              icon: '🎯',
             },
             {
               title: 'Vision',
               description: 'Devenir la référence en Afrique de l\'Ouest pour les solutions digitales premium, en accompagnant la transformation numérique du continent.',
-              icon: '🔭',
             },
             {
               title: 'Valeurs',
               description: 'Excellence, transparence, proximité. Nous croyons en la qualité sans compromis, la communication ouverte et l\'accompagnement personnalisé.',
-              icon: '💎',
             },
           ].map((item, i) => (
             <ScrollReveal key={item.title} delay={i * 0.1}>
-              <div className="glass-card p-8 rounded-xl text-center h-full">
-                <div className="text-4xl mb-4">{item.icon}</div>
-                <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold mb-3">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+              <div className="p-8 rounded-xl bg-[#141414] border border-[#2A2A2A] text-center h-full">
+                <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#F5F2ED] mb-3">{item.title}</h3>
+                <p className="text-sm text-[#999] leading-relaxed">{item.description}</p>
               </div>
             </ScrollReveal>
           ))}
@@ -112,32 +108,32 @@ export default function AboutPage() {
       </SectionWrapper>
 
       {/* Legal Info */}
-      <section className="py-16 border-t border-border">
+      <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
-            <h2 className="font-[family-name:var(--font-heading)] text-2xl font-bold mb-8 text-center">
+            <h2 className="font-[family-name:var(--font-heading)] text-2xl font-bold text-[#1A1A1A] mb-8 text-center">
               Informations Légales
             </h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 max-w-3xl mx-auto">
-              <div className="glass-card p-6 rounded-xl flex items-start gap-3">
-                <FileText className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              <div className="p-6 rounded-xl bg-[#F3F1EE] border border-[#E8E5E0] flex items-start gap-3">
+                <FileText className="h-5 w-5 text-copper shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">RCCM</p>
-                  <p className="font-[family-name:var(--font-mono)] text-sm">{SITE_CONFIG.rccm}</p>
+                  <p className="text-xs text-[#6B6B6B] uppercase tracking-wider mb-1">RCCM</p>
+                  <p className="font-[family-name:var(--font-mono)] text-sm text-[#1A1A1A]">{SITE_CONFIG.rccm}</p>
                 </div>
               </div>
-              <div className="glass-card p-6 rounded-xl flex items-start gap-3">
-                <Building className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              <div className="p-6 rounded-xl bg-[#F3F1EE] border border-[#E8E5E0] flex items-start gap-3">
+                <Building className="h-5 w-5 text-copper shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">NINEA</p>
-                  <p className="font-[family-name:var(--font-mono)] text-sm">{SITE_CONFIG.ninea}</p>
+                  <p className="text-xs text-[#6B6B6B] uppercase tracking-wider mb-1">NINEA</p>
+                  <p className="font-[family-name:var(--font-mono)] text-sm text-[#1A1A1A]">{SITE_CONFIG.ninea}</p>
                 </div>
               </div>
-              <div className="glass-card p-6 rounded-xl flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              <div className="p-6 rounded-xl bg-[#F3F1EE] border border-[#E8E5E0] flex items-start gap-3">
+                <MapPin className="h-5 w-5 text-copper shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Siège</p>
-                  <p className="text-sm">{SITE_CONFIG.location}</p>
+                  <p className="text-xs text-[#6B6B6B] uppercase tracking-wider mb-1">Siège</p>
+                  <p className="text-sm text-[#1A1A1A]">{SITE_CONFIG.location}</p>
                 </div>
               </div>
             </div>

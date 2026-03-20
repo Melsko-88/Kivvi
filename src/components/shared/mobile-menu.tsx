@@ -8,7 +8,7 @@ import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { NAV_LINKS } from '@/lib/constants'
 import { Logo } from './logo'
-import { LiquidGlassButton } from './liquid-glass-button'
+import { Button } from './button'
 
 interface MobileMenuProps {
   open: boolean
@@ -38,7 +38,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 bg-background/95 backdrop-blur-xl"
+          className="fixed inset-0 z-50 bg-[#FAFAF7]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -48,12 +48,12 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             {/* Header */}
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2" onClick={onClose}>
-                <Logo variant="flat-white" size={36} />
-                <span className="font-heading text-xl font-bold">KIVVI</span>
+                <Logo variant="dark" size={36} />
+                <span className="font-[family-name:var(--font-heading)] text-xl font-bold text-[#1A1A1A]">KIVVI</span>
               </Link>
               <button
                 onClick={onClose}
-                className="flex items-center justify-center h-10 w-10 rounded-lg bg-white/5 border border-white/10"
+                className="flex items-center justify-center h-10 w-10 rounded-lg border border-[#E8E5E0] text-[#1A1A1A]"
                 aria-label="Fermer le menu"
               >
                 <X className="h-5 w-5" />
@@ -75,8 +75,8 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                       href={link.href}
                       onClick={onClose}
                       className={cn(
-                        'block text-center text-2xl font-heading font-semibold py-3 transition-colors',
-                        isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                        'block text-center text-3xl font-[family-name:var(--font-heading)] font-bold py-3 transition-colors',
+                        isActive ? 'text-copper' : 'text-[#6B6B6B] hover:text-[#1A1A1A]'
                       )}
                     >
                       {link.label}
@@ -88,11 +88,11 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="mt-6"
+                className="mt-8"
               >
-                <LiquidGlassButton href="/devis" size="lg" onClick={onClose}>
+                <Button href="/devis" size="lg" onClick={onClose}>
                   Demander un devis
-                </LiquidGlassButton>
+                </Button>
               </motion.div>
             </nav>
           </div>

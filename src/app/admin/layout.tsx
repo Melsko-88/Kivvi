@@ -59,7 +59,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="dark min-h-screen flex bg-background">
       {/* Sidebar */}
       <aside
         className={cn(
@@ -69,7 +69,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       >
         <div className="flex items-center justify-between px-5 h-16 border-b border-border">
           <Link href="/admin/dashboard" className="flex items-center gap-2">
-            <Logo variant="flat-white" size={28} />
+            <Logo variant="light" size={28} />
             <span className="font-[family-name:var(--font-heading)] text-lg font-bold">KIVVI</span>
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden">

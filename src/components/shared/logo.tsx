@@ -3,24 +3,18 @@
 import Image from 'next/image'
 import { LOGOS } from '@/lib/constants'
 
-type LogoVariant = 'flat-white' | 'flat-black' | 'glass-3d'
-
 interface LogoProps {
-  variant?: LogoVariant
+  variant?: 'light' | 'dark'
   size?: number
   className?: string
 }
 
-const logoSrc: Record<LogoVariant, string> = {
-  'flat-white': LOGOS.flatWhite,
-  'flat-black': LOGOS.flatBlack,
-  'glass-3d': LOGOS.glass3D,
-}
+export function Logo({ variant = 'dark', size = 40, className }: LogoProps) {
+  const src = variant === 'dark' ? LOGOS.flatBlack : LOGOS.flatWhite
 
-export function Logo({ variant = 'flat-white', size = 40, className }: LogoProps) {
   return (
     <Image
-      src={logoSrc[variant]}
+      src={src}
       alt="KIVVI"
       width={size}
       height={size}

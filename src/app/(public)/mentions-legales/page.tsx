@@ -13,7 +13,7 @@ export default function MentionsLegalesPage() {
     <>
       <PageHeader title="Mentions Légales" />
       <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl prose prose-invert prose-sm">
+        <div className="mx-auto max-w-3xl prose prose-neutral prose-sm">
           <h2>Éditeur du site</h2>
           <p>
             <strong>{SITE_CONFIG.name}</strong><br />

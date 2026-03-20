@@ -13,7 +13,7 @@ export default function ConfidentialitePage() {
     <>
       <PageHeader title="Politique de Confidentialité" />
       <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl prose prose-invert prose-sm">
+        <div className="mx-auto max-w-3xl prose prose-neutral prose-sm">
           <p>
             Dernière mise à jour : mars 2026
           </p>

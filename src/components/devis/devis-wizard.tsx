@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, ArrowRight, Send, CheckCircle, AlertCircle } from 'lucide-react'
 import { devisSchema, type DevisFormValues } from '@/lib/schemas'
 import { DEVIS_TYPES, BUDGET_RANGES } from '@/lib/constants'
-import { LiquidGlassButton } from '@/components/shared/liquid-glass-button'
+import { Button } from '@/components/shared/button'
 import { cn } from '@/lib/utils'
 
 const STEPS = ['Type de projet', 'Description', 'Budget', 'Vos coordonnées']
@@ -90,10 +90,10 @@ export function DevisWizard() {
 
   if (status === 'success') {
     return (
-      <div className="glass-card p-10 rounded-xl text-center">
-        <CheckCircle className="h-14 w-14 text-green-500 mx-auto mb-4" />
-        <h3 className="font-[family-name:var(--font-heading)] text-2xl font-bold mb-2">Demande envoyée !</h3>
-        <p className="text-muted-foreground max-w-md mx-auto">
+      <div className="bg-[#F3F1EE] border border-[#E8E5E0] p-10 rounded-xl text-center">
+        <CheckCircle className="h-14 w-14 text-[#4A7C59] mx-auto mb-4" />
+        <h3 className="font-[family-name:var(--font-heading)] text-2xl font-bold text-[#1A1A1A] mb-2">Demande envoyée !</h3>
+        <p className="text-[#6B6B6B] max-w-md mx-auto">
           Merci pour votre confiance. Nous étudions votre demande et vous enverrons
           une proposition personnalisée sous 48 heures.
         </p>
@@ -102,7 +102,7 @@ export function DevisWizard() {
   }
 
   return (
-    <div className="glass-card p-8 rounded-xl">
+    <div className="bg-white border border-[#E8E5E0] p-8 rounded-xl">
       {/* Progress bar */}
       <div className="mb-8">
         <div className="flex justify-between mb-3">
@@ -111,23 +111,23 @@ export function DevisWizard() {
               key={s}
               className={cn(
                 'text-xs font-medium transition-colors',
-                i <= step ? 'text-primary' : 'text-muted-foreground/50'
+                i <= step ? 'text-copper' : 'text-[#999]'
               )}
             >
               {s}
             </span>
           ))}
         </div>
-        <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+        <div className="h-1 bg-[#E8E5E0] rounded-full overflow-hidden">
           <div
-            className="h-full bg-primary rounded-full transition-all duration-500"
+            className="h-full bg-copper rounded-full transition-all duration-500"
             style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
           />
         </div>
       </div>
 
       {status === 'error' && (
-        <div className="flex items-center gap-2 text-sm text-red-400 bg-red-500/10 px-4 py-3 rounded-lg mb-6">
+        <div className="flex items-center gap-2 text-sm text-[#C75050] bg-[#C75050]/10 px-4 py-3 rounded-lg mb-6">
           <AlertCircle className="h-4 w-4 shrink-0" />
           Une erreur est survenue. Veuillez réessayer.
         </div>
@@ -137,7 +137,7 @@ export function DevisWizard() {
         {/* Step 1: Type */}
         {step === 0 && (
           <div>
-            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold mb-6">
+            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#1A1A1A] mb-6">
               Quel type de projet ?
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -149,37 +149,37 @@ export function DevisWizard() {
                   className={cn(
                     'text-left p-4 rounded-xl border transition-all',
                     selectedType === t.value
-                      ? 'border-primary bg-primary/10 shadow-[0_0_16px_rgba(37,99,235,0.2)]'
-                      : 'border-border bg-white/[0.02] hover:border-white/20'
+                      ? 'border-copper bg-copper/5'
+                      : 'border-[#E8E5E0] bg-[#FAFAF7] hover:border-copper/40'
                   )}
                 >
-                  <p className="font-medium text-sm">{t.label}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{t.description}</p>
+                  <p className="font-medium text-sm text-[#1A1A1A]">{t.label}</p>
+                  <p className="text-xs text-[#6B6B6B] mt-0.5">{t.description}</p>
                 </button>
               ))}
             </div>
-            {errors.type && <p className="text-xs text-red-400 mt-2">{errors.type.message}</p>}
+            {errors.type && <p className="text-xs text-[#C75050] mt-2">{errors.type.message}</p>}
           </div>
         )}
 
         {/* Step 2: Description + Features */}
         {step === 1 && (
           <div>
-            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold mb-6">
+            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#1A1A1A] mb-6">
               Décrivez votre projet
             </h3>
             <textarea
               {...register('description')}
               rows={5}
               className={cn(
-                'w-full bg-white/5 border border-border rounded-lg px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors resize-none mb-5',
-                errors.description && 'border-red-500'
+                'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-3 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors resize-none mb-5',
+                errors.description && 'border-[#C75050]'
               )}
               placeholder="Décrivez votre projet, vos objectifs, votre public cible..."
             />
-            {errors.description && <p className="text-xs text-red-400 mb-4">{errors.description.message}</p>}
+            {errors.description && <p className="text-xs text-[#C75050] mb-4">{errors.description.message}</p>}
 
-            <p className="text-sm font-medium mb-3">Fonctionnalités souhaitées (optionnel)</p>
+            <p className="text-sm font-medium text-[#1A1A1A] mb-3">Fonctionnalités souhaitées (optionnel)</p>
             <div className="flex flex-wrap gap-2">
               {FEATURE_OPTIONS.map((f) => (
                 <button
@@ -189,8 +189,8 @@ export function DevisWizard() {
                   className={cn(
                     'px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
                     selectedFeatures.includes(f)
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-border text-muted-foreground hover:text-foreground'
+                      ? 'border-copper bg-copper/10 text-copper'
+                      : 'border-[#E8E5E0] text-[#6B6B6B] hover:text-[#1A1A1A]'
                   )}
                 >
                   {f}
@@ -203,7 +203,7 @@ export function DevisWizard() {
         {/* Step 3: Budget + Deadline */}
         {step === 2 && (
           <div>
-            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold mb-6">
+            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#1A1A1A] mb-6">
               Quel est votre budget ?
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
@@ -215,22 +215,22 @@ export function DevisWizard() {
                   className={cn(
                     'text-left p-4 rounded-xl border transition-all',
                     selectedBudget === b.value
-                      ? 'border-primary bg-primary/10 shadow-[0_0_16px_rgba(37,99,235,0.2)]'
-                      : 'border-border bg-white/[0.02] hover:border-white/20'
+                      ? 'border-copper bg-copper/5'
+                      : 'border-[#E8E5E0] bg-[#FAFAF7] hover:border-copper/40'
                   )}
                 >
-                  <p className="font-[family-name:var(--font-mono)] text-sm font-medium">{b.label}</p>
+                  <p className="font-[family-name:var(--font-mono)] text-sm font-medium text-[#1A1A1A]">{b.label}</p>
                 </button>
               ))}
             </div>
-            {errors.budget && <p className="text-xs text-red-400 mb-4">{errors.budget.message}</p>}
+            {errors.budget && <p className="text-xs text-[#C75050] mb-4">{errors.budget.message}</p>}
 
             <div>
-              <label className="block text-sm font-medium mb-1.5">Délai souhaité (optionnel)</label>
+              <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Délai souhaité (optionnel)</label>
               <input
                 {...register('deadline')}
                 type="text"
-                className="w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                className="w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors"
                 placeholder="Ex: 1 mois, fin mars, ASAP..."
               />
             </div>
@@ -240,54 +240,54 @@ export function DevisWizard() {
         {/* Step 4: Contact info */}
         {step === 3 && (
           <div>
-            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold mb-6">
+            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#1A1A1A] mb-6">
               Vos coordonnées
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1.5">Nom complet *</label>
+                <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Nom complet *</label>
                 <input
                   {...register('name')}
                   className={cn(
-                    'w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors',
-                    errors.name && 'border-red-500'
+                    'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors',
+                    errors.name && 'border-[#C75050]'
                   )}
                   placeholder="Votre nom complet"
                 />
-                {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name.message}</p>}
+                {errors.name && <p className="text-xs text-[#C75050] mt-1">{errors.name.message}</p>}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Email *</label>
+                  <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Email *</label>
                   <input
                     {...register('email')}
                     type="email"
                     className={cn(
-                      'w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors',
-                      errors.email && 'border-red-500'
+                      'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors',
+                      errors.email && 'border-[#C75050]'
                     )}
                     placeholder="votre@email.com"
                   />
-                  {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email.message}</p>}
+                  {errors.email && <p className="text-xs text-[#C75050] mt-1">{errors.email.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Téléphone *</label>
+                  <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Téléphone *</label>
                   <input
                     {...register('phone')}
                     className={cn(
-                      'w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors',
-                      errors.phone && 'border-red-500'
+                      'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors',
+                      errors.phone && 'border-[#C75050]'
                     )}
                     placeholder="+221 77 xxx xx xx"
                   />
-                  {errors.phone && <p className="text-xs text-red-400 mt-1">{errors.phone.message}</p>}
+                  {errors.phone && <p className="text-xs text-[#C75050] mt-1">{errors.phone.message}</p>}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5">Entreprise / Organisation</label>
+                <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Entreprise / Organisation</label>
                 <input
                   {...register('company')}
-                  className="w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                  className="w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors"
                   placeholder="Nom de votre entreprise (optionnel)"
                 />
               </div>
@@ -296,12 +296,12 @@ export function DevisWizard() {
         )}
 
         {/* Navigation */}
-        <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
+        <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#E8E5E0]">
           {step > 0 ? (
             <button
               type="button"
               onClick={() => setStep((s) => s - 1)}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-2 text-sm text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               Retour
@@ -314,16 +314,16 @@ export function DevisWizard() {
             <button
               type="button"
               onClick={nextStep}
-              className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              className="flex items-center gap-2 text-sm font-medium text-copper hover:text-copper-hover transition-colors"
             >
               Suivant
               <ArrowRight className="h-4 w-4" />
             </button>
           ) : (
-            <LiquidGlassButton type="submit" variant="primary" disabled={status === 'loading'}>
+            <Button type="submit" variant="primary" disabled={status === 'loading'}>
               {status === 'loading' ? 'Envoi en cours...' : 'Envoyer la demande'}
               <Send className="h-4 w-4" />
-            </LiquidGlassButton>
+            </Button>
           )}
         </div>
       </form>

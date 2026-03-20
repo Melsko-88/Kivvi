@@ -8,7 +8,6 @@ import { LogIn, AlertCircle } from 'lucide-react'
 import { loginSchema, type LoginFormValues } from '@/lib/schemas'
 import { createClient } from '@/lib/supabase/client'
 import { Logo } from '@/components/shared/logo'
-import { LiquidGlassButton } from '@/components/shared/liquid-glass-button'
 import { cn } from '@/lib/utils'
 
 export default function AdminLoginPage() {
@@ -44,10 +43,10 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="dark min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <Logo variant="glass-3d" size={64} className="mx-auto mb-4" />
+          <Logo variant="light" size={64} className="mx-auto mb-4" />
           <h1 className="font-[family-name:var(--font-heading)] text-2xl font-bold">Administration</h1>
           <p className="text-sm text-muted-foreground mt-1">Connectez-vous pour accéder au panneau</p>
         </div>
@@ -88,10 +87,14 @@ export default function AdminLoginPage() {
             {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password.message}</p>}
           </div>
 
-          <LiquidGlassButton type="submit" variant="primary" disabled={loading} className="w-full justify-center">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 rounded-lg bg-primary text-white font-semibold px-6 py-3 text-sm transition-colors hover:bg-primary/80 disabled:opacity-50"
+          >
             {loading ? 'Connexion...' : 'Se connecter'}
             <LogIn className="h-4 w-4" />
-          </LiquidGlassButton>
+          </button>
         </form>
       </div>
     </div>

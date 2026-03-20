@@ -2,7 +2,7 @@ import { createMetadata } from '@/lib/metadata'
 import { PageHeader } from '@/components/shared/page-header'
 import { SectionWrapper } from '@/components/shared/section-wrapper'
 import { ScrollReveal } from '@/components/shared/scroll-reveal'
-import { LiquidGlassButton } from '@/components/shared/liquid-glass-button'
+import { Button } from '@/components/shared/button'
 import { ArrowRight } from 'lucide-react'
 import { PortfolioGrid } from './portfolio-grid'
 
@@ -26,20 +26,20 @@ export default function PortfolioPage() {
       </SectionWrapper>
 
       {/* CTA Section */}
-      <section className="gradient-mesh grain-overlay py-20 md:py-28">
-        <div className="relative z-10 mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+      <section className="section-dark py-24 md:py-32">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
           <ScrollReveal>
-            <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
-              Votre projet pourrait &ecirc;tre le prochain
+            <h2 className="font-[family-name:var(--font-heading)] text-3xl font-bold tracking-tight text-[#F5F2ED] sm:text-4xl">
+              Votre projet pourrait être le prochain
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Parlez-nous de votre vision et transformons-la en r&eacute;alit&eacute; digitale.
+            <p className="mt-4 text-lg text-[#999]">
+              Parlez-nous de votre vision et transformons-la en réalité digitale.
             </p>
             <div className="mt-8">
-              <LiquidGlassButton href="/devis" variant="primary" size="lg">
-                D&eacute;marrer un projet
+              <Button href="/devis" variant="primary" size="lg">
+                Démarrer un projet
                 <ArrowRight className="h-4 w-4" />
-              </LiquidGlassButton>
+              </Button>
             </div>
           </ScrollReveal>
         </div>

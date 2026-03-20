@@ -23,32 +23,32 @@ export function ServicesGrid() {
           return (
             <motion.div
               key={service.name}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.5, delay: i * 0.06 }}
-              className="glass-card group p-8 rounded-xl"
+              className="group p-8 rounded-xl bg-[#F3F1EE] border border-[#E8E5E0]"
             >
               <div className="flex items-start gap-5">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-copper/10 text-copper group-hover:bg-copper/20 transition-colors">
                   <Icon className="h-7 w-7" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold mb-2">
+                  <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#1A1A1A] mb-2">
                     {service.name}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-sm text-[#6B6B6B] mb-4">
                     {service.description}
                   </p>
                   <ul className="space-y-2 mb-5">
                     {service.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Check className="h-4 w-4 text-primary shrink-0" />
+                      <li key={feature} className="flex items-center gap-2 text-sm text-[#6B6B6B]">
+                        <Check className="h-4 w-4 text-copper shrink-0" />
                         {feature}
                       </li>
                     ))}
                   </ul>
-                  <div className="font-[family-name:var(--font-mono)] text-lg font-semibold text-primary">
+                  <div className="font-[family-name:var(--font-mono)] text-lg font-semibold text-copper">
                     {typeof service.price === 'number'
                       ? `À partir de ${formatPrice(service.price)}`
                       : service.price}

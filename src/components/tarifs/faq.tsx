@@ -19,17 +19,17 @@ export function FAQ() {
         {FAQ_ITEMS.map((item, i) => {
           const isOpen = openIndex === i
           return (
-            <div key={i} className="glass-card rounded-xl overflow-hidden">
+            <div key={i} className="rounded-xl bg-[#F3F1EE] border border-[#E8E5E0] overflow-hidden">
               <button
                 onClick={() => setOpenIndex(isOpen ? null : i)}
                 className="flex w-full items-center justify-between p-5 text-left"
               >
-                <span className="font-[family-name:var(--font-heading)] text-sm font-semibold pr-4">
+                <span className="font-[family-name:var(--font-heading)] text-sm font-semibold text-[#1A1A1A] pr-4">
                   {item.question}
                 </span>
                 <ChevronDown
                   className={cn(
-                    'h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-300',
+                    'h-5 w-5 shrink-0 text-[#6B6B6B] transition-transform duration-300',
                     isOpen && 'rotate-180'
                   )}
                 />
@@ -42,7 +42,7 @@ export function FAQ() {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
                   >
-                    <div className="px-5 pb-5 text-sm text-muted-foreground leading-relaxed">
+                    <div className="px-5 pb-5 text-sm text-[#6B6B6B] leading-relaxed">
                       {item.answer}
                     </div>
                   </motion.div>
