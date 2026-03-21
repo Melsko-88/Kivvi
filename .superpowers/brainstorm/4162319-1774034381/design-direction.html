@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kivvi — Design Direction</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #000;
+    color: #fff;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  .page-title {
+    text-align: center;
+    padding: 40px 20px 20px;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    font-weight: 500;
+  }
+
+  .page-subtitle {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    color: #fff;
+  }
+
+  /* === SECTION 1: HERO === */
+  .hero-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    overflow: hidden;
+    padding: 60px 20px;
+  }
+
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 50%, rgba(255,120,0,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.03) 0%, transparent 50%);
+    animation: drift 20s ease-in-out infinite;
+  }
+
+  @keyframes drift {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-3%, 2%); }
+  }
+
+  .hero-logo {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 40px;
+  }
+
+  .hero-logo img {
+    width: 320px;
+    height: auto;
+    filter: drop-shadow(0 0 60px rgba(255,255,255,0.1));
+  }
+
+  .hero-tagline {
+    position: relative;
+    z-index: 2;
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 50px;
+  }
+
+  .hero-headline {
+    position: relative;
+    z-index: 2;
+    font-size: 56px;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.1;
+    max-width: 800px;
+    margin-bottom: 30px;
+  }
+
+  .hero-headline .orange { color: #FF7A00; }
+
+  .hero-description {
+    position: relative;
+    z-index: 2;
+    font-size: 18px;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    max-width: 500px;
+    margin-bottom: 50px;
+    font-weight: 300;
+  }
+
+  /* Glass CTA Button */
+  .glass-btn {
+    position: relative;
+    z-index: 2;
+    padding: 18px 48px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 60px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.4s ease;
+  }
+
+  .glass-btn:hover {
+    background: rgba(255,122,0,0.1);
+    border-color: rgba(255,122,0,0.3);
+    box-shadow: 0 0 40px rgba(255,122,0,0.15);
+  }
+
+  .glass-btn-primary {
+    background: #FF7A00;
+    border-color: #FF7A00;
+  }
+
+  .glass-btn-primary:hover {
+    background: #ff8c1a;
+    box-shadow: 0 0 50px rgba(255,122,0,0.3);
+  }
+
+  /* === LABEL === */
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #FF7A00;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  /* === SECTION 2: GLASS CARDS (Services) === */
+  .services-section {
+    padding: 120px 40px;
+    background: #000;
+  }
+
+  .services-section h2 {
+    font-size: 42px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .glass-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .glass-card {
+    position: relative;
+    padding: 40px 32px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    transition: all 0.4s ease;
+    overflow: hidden;
+  }
+
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  }
+
+  .glass-card:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,122,0,0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .glass-card .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(255,122,0,0.1);
+    border: 1px solid rgba(255,122,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+
+  .glass-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .glass-card p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+  }
+
+  /* === SECTION 3: WHITE SECTION (Portfolio) === */
+  .portfolio-section {
+    padding: 120px 40px;
+    background: #fff;
+    color: #000;
+  }
+
+  .portfolio-section h2 {
+    font-size: 42px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 16px;
+    color: #000;
+  }
+
+  .portfolio-section .subtitle {
+    text-align: center;
+    color: rgba(0,0,0,0.5);
+    font-size: 16px;
+    margin-bottom: 60px;
+  }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .portfolio-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #f5f5f5;
+    height: 300px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+  }
+
+  .portfolio-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+
+  .portfolio-card .overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 30px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    color: #fff;
+  }
+
+  .portfolio-card .overlay h3 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .portfolio-card .overlay span {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .portfolio-card .placeholder-img {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e0e0e0, #f0f0f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 14px;
+  }
+
+  /* === SECTION 4: GLASS STATS === */
+  .stats-section {
+    padding: 100px 40px;
+    background: #000;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .stat-item .number {
+    font-size: 48px;
+    font-weight: 800;
+    color: #FF7A00;
+    line-height: 1;
+  }
+
+  .stat-item .label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 8px;
+  }
+
+  /* === SECTION 5: CTA === */
+  .cta-section {
+    padding: 120px 40px;
+    text-align: center;
+    background: #000;
+    position: relative;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,122,0,0.08) 0%, transparent 70%);
+  }
+
+  .cta-section h2 {
+    position: relative;
+    z-index: 2;
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 20px;
+  }
+
+  .cta-section p {
+    position: relative;
+    z-index: 2;
+    color: rgba(255,255,255,0.5);
+    font-size: 18px;
+    margin-bottom: 40px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* === NAVBAR (fixed) === */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .navbar .logo-text {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+
+  .navbar .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .navbar .nav-links a {
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+  }
+
+  .navbar .nav-links a:hover,
+  .navbar .nav-links a.active {
+    color: #fff;
+  }
+
+  .navbar .nav-cta {
+    padding: 10px 24px;
+    border-radius: 40px;
+    background: #FF7A00;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  /* === FOOTER === */
+  .footer {
+    padding: 60px 40px 30px;
+    background: #000;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+    color: rgba(255,255,255,0.3);
+    font-size: 13px;
+  }
+
+  /* === SECTION DIVIDER === */
+  .divider {
+    text-align: center;
+    padding: 10px 0;
+    color: rgba(255,255,255,0.15);
+    font-size: 12px;
+    letter-spacing: 6px;
+    background: #000;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .glass-grid { grid-template-columns: 1fr; }
+    .portfolio-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero-headline { font-size: 36px; }
+    .navbar .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo-text">KIVVI</div>
+  <ul class="nav-links">
+    <a href="#" class="active">Accueil</a>
+    <a href="#">Services</a>
+    <a href="#">Realisations</a>
+    <a href="#">A propos</a>
+    <a href="#">Contact</a>
+  </ul>
+  <a href="#" class="nav-cta">Devis gratuit</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero-section">
+  <div class="hero-logo">
+    <img src="https://res.cloudinary.com/dzi8whann/image/upload/v1773864166/tiak-tiak/icons/transport/daktlszjwuqzqlebfklm.png" alt="Kivvi" />
+  </div>
+  <div class="hero-tagline">Agence digitale</div>
+  <h1 class="hero-headline">
+    On construit des<br/>
+    experiences <span class="orange">digitales</span>
+  </h1>
+  <p class="hero-description">
+    Sites web, applications mobiles et solutions sur mesure pour les entreprises qui veulent marquer les esprits.
+  </p>
+  <div style="display:flex;gap:16px;position:relative;z-index:2;">
+    <button class="glass-btn glass-btn-primary">Demarrer un projet</button>
+    <button class="glass-btn">Nos realisations</button>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services-section">
+  <div class="section-label" style="text-align:center;">Ce qu'on fait</div>
+  <h2>Nos <span style="color:#FF7A00;">services</span></h2>
+  <div class="glass-grid">
+    <div class="glass-card">
+      <div class="card-icon">&#x1F310;</div>
+      <h3>Sites Web</h3>
+      <p>Vitrines, e-commerce, plateformes — des sites rapides, beaux et qui convertissent.</p>
+    </div>
+    <div class="glass-card">
+      <div class="card-icon">&#x1F4F1;</div>
+      <h3>Apps Mobile</h3>
+      <p>Applications iOS et Android natives avec des interfaces fluides et intuitives.</p>
+    </div>
+    <div class="glass-card">
+      <div class="card-icon">&#x2699;</div>
+      <h3>Solutions Sur Mesure</h3>
+      <p>Systemes de gestion, APIs, automatisation — on construit ce dont vous avez besoin.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider">- - -</div>
+
+<!-- PORTFOLIO (White section) -->
+<section class="portfolio-section">
+  <div class="section-label" style="text-align:center;color:#FF7A00;">Portfolio</div>
+  <h2>Realisations recentes</h2>
+  <p class="subtitle">Chaque projet est une histoire. Voici les notres.</p>
+  <div class="portfolio-grid">
+    <div class="portfolio-card">
+      <div class="placeholder-img">Capture projet 1</div>
+      <div class="overlay">
+        <h3>Nopal</h3>
+        <span>App mobile — Transport & Marketplace</span>
+      </div>
+    </div>
+    <div class="portfolio-card">
+      <div class="placeholder-img">Capture projet 2</div>
+      <div class="overlay">
+        <h3>Client B</h3>
+        <span>Site vitrine — E-commerce</span>
+      </div>
+    </div>
+    <div class="portfolio-card">
+      <div class="placeholder-img">Capture projet 3</div>
+      <div class="overlay">
+        <h3>Client C</h3>
+        <span>Plateforme SaaS</span>
+      </div>
+    </div>
+    <div class="portfolio-card">
+      <div class="placeholder-img">Capture projet 4</div>
+      <div class="overlay">
+        <h3>Client D</h3>
+        <span>Application mobile</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="number">15+</div>
+      <div class="label">Projets livres</div>
+    </div>
+    <div class="stat-item">
+      <div class="number">100%</div>
+      <div class="label">Clients satisfaits</div>
+    </div>
+    <div class="stat-item">
+      <div class="number">2</div>
+      <div class="label">Annees</div>
+    </div>
+    <div class="stat-item">
+      <div class="number">24/7</div>
+      <div class="label">Support</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Un projet en tete<span style="color:#FF7A00;">?</span></h2>
+  <p>Discutons de votre idee. Premier echange gratuit, sans engagement.</p>
+  <button class="glass-btn glass-btn-primary" style="position:relative;z-index:2;">Demander un devis</button>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>&copy; 2026 Kivvi. Tous droits reserves. &nbsp;&middot;&nbsp; Dakar, Senegal</p>
+</footer>
+
+</body>
+</html>

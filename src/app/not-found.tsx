@@ -2,20 +2,22 @@ import Link from 'next/link'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FAFAF7] px-4">
-      <div className="text-center">
-        <p className="font-[family-name:var(--font-mono)] text-7xl font-bold text-copper mb-4">404</p>
-        <h1 className="font-[family-name:var(--font-heading)] text-2xl font-bold text-[#1A1A1A] mb-2">Page introuvable</h1>
-        <p className="text-[#6B6B6B] mb-8">
-          La page que vous cherchez n&apos;existe pas ou a été déplacée.
-        </p>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-copper text-white font-medium text-sm hover:bg-copper-hover transition-colors"
-        >
-          Retour à l&apos;accueil
-        </Link>
-      </div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
+      <span className="mb-4 font-[family-name:var(--font-heading)] text-8xl font-bold text-foreground/5">
+        404
+      </span>
+      <h1 className="mb-3 font-[family-name:var(--font-heading)] text-2xl font-bold">
+        Page introuvable
+      </h1>
+      <p className="mb-8 text-sm text-foreground/40">
+        La page que vous cherchez n&apos;existe pas ou a été déplacée.
+      </p>
+      <Link
+        href="/"
+        className="rounded-full border border-foreground/10 bg-foreground/[0.03] px-6 py-2.5 text-sm font-medium transition-all hover:border-foreground/20 hover:bg-foreground/[0.06]"
+      >
+        Retour à l&apos;accueil
+      </Link>
     </div>
   )
 }

@@ -1,68 +1,88 @@
-import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next'
+import { Syne, Space_Grotesk, JetBrains_Mono } from 'next/font/google'
+import { ThemeProvider } from 'next-themes'
+import './globals.css'
 
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["500", "600", "700", "800"],
-});
+const syne = Syne({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  display: 'swap',
+})
 
-const inter = Inter({
-  variable: "--font-body",
-  subsets: ["latin"],
-  display: "swap",
-});
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-body',
+  display: 'swap',
+})
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: {
-    default: "KIVVI — Agence Digitale Africaine",
-    template: "%s | KIVVI",
+    default: 'KIVVI — Agence Digitale Africaine',
+    template: '%s | KIVVI',
   },
   description:
-    "KIVVI conçoit des sites web, applications mobiles et solutions digitales pour les entreprises, institutions et organisations en Afrique.",
-  metadataBase: new URL("https://kivvi.tech"),
+    'KIVVI conçoit des expériences digitales premium pour l\'Afrique. Sites web, applications mobiles, solutions sur mesure.',
+  metadataBase: new URL('https://kivvi.tech'),
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Kivvi',
+  },
   openGraph: {
-    type: "website",
-    locale: "fr_FR",
-    url: "https://kivvi.tech",
-    siteName: "KIVVI",
-    title: "KIVVI — Agence Digitale Africaine",
+    type: 'website',
+    locale: 'fr_FR',
+    url: 'https://kivvi.tech',
+    siteName: 'KIVVI',
+    title: 'KIVVI — Agence Digitale Africaine',
     description:
-      "Sites web, applications mobiles et solutions digitales premium pour l'Afrique.",
+      'KIVVI conçoit des expériences digitales premium pour l\'Afrique.',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "KIVVI — Agence Digitale Africaine",
+    card: 'summary_large_image',
+    title: 'KIVVI — Agence Digitale Africaine',
     description:
-      "Sites web, applications mobiles et solutions digitales premium pour l'Afrique.",
+      'KIVVI conçoit des expériences digitales premium pour l\'Afrique.',
   },
   robots: {
     index: true,
     follow: true,
   },
-};
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html
       lang="fr"
-      className={`${plusJakarta.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${syne.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col font-[family-name:var(--font-body)] bg-background text-foreground">
-        {children}
+      <head>
+        <meta name="theme-color" content="#ffffff" />
+      </head>
+      <body className="bg-background text-foreground font-[family-name:var(--font-body)] antialiased transition-colors duration-300 overflow-x-hidden">
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          {children}
+        </ThemeProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`,
+          }}
+        />
       </body>
     </html>
-  );
+  )
 }

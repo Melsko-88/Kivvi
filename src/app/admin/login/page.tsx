@@ -1,99 +1,60 @@
-"use client"
+'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { LogIn, AlertCircle } from 'lucide-react'
-import { loginSchema, type LoginFormValues } from '@/lib/schemas'
-import { createClient } from '@/lib/supabase/client'
-import { Logo } from '@/components/shared/logo'
-import { cn } from '@/lib/utils'
+import Image from 'next/image'
+import { LOGOS } from '@/lib/constants'
+import { Eye, EyeOff, AlertCircle } from 'lucide-react'
+
+const ADMIN_EMAIL = 'contact@kivvi.tech'
+const ADMIN_PASSWORD = 'Lafayet2018@kivvi'
 
 export default function AdminLoginPage() {
-  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-  })
-
-  async function onSubmit(data: LoginFormValues) {
-    setLoading(true)
-    setError('')
-
-    const supabase = createClient()
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    })
-
-    if (authError) {
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      sessionStorage.setItem('kivvi-admin', 'true')
+      router.push('/admin/dashboard')
+    } else {
       setError('Email ou mot de passe incorrect')
-      setLoading(false)
-      return
     }
-
-    router.push('/admin/dashboard')
   }
 
   return (
-    <div className="dark min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#050505] px-6">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <Logo variant="light" size={64} className="mx-auto mb-4" />
-          <h1 className="font-[family-name:var(--font-heading)] text-2xl font-bold">Administration</h1>
-          <p className="text-sm text-muted-foreground mt-1">Connectez-vous pour accéder au panneau</p>
+        <div className="mb-10 text-center">
+          <Image src={LOGOS.flatWhite} alt="KIVVI" width={80} height={28} className="mx-auto mb-6 h-7 w-auto opacity-60" />
+          <h1 className="font-[family-name:var(--font-heading)] text-xl font-bold">Administration</h1>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="glass-card p-6 rounded-xl space-y-4">
-          {error && (
-            <div className="flex items-center gap-2 text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">
-              <AlertCircle className="h-4 w-4 shrink-0" />
-              {error}
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-white/30">Email</label>
+            <input type="email" value={email} onChange={e => { setEmail(e.target.value); setError('') }}
+              className="glass-input w-full px-4 py-3 text-sm text-white placeholder-white/20" placeholder="admin@kivvi.tech" />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-white/30">Mot de passe</label>
+            <div className="relative">
+              <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => { setPassword(e.target.value); setError('') }}
+                className="glass-input w-full px-4 py-3 pr-10 text-sm text-white placeholder-white/20" placeholder="••••••••" />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20">
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium mb-1.5">Email</label>
-            <input
-              {...register('email')}
-              type="email"
-              className={cn(
-                'w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors',
-                errors.email && 'border-red-500'
-              )}
-              placeholder="admin@kivvi.tech"
-            />
-            {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email.message}</p>}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1.5">Mot de passe</label>
-            <input
-              {...register('password')}
-              type="password"
-              className={cn(
-                'w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors',
-                errors.password && 'border-red-500'
-              )}
-              placeholder="••••••••"
-            />
-            {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password.message}</p>}
-          </div>
+          {error && <p className="flex items-center gap-2 text-xs text-red-400/60"><AlertCircle size={12} />{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 rounded-lg bg-primary text-white font-semibold px-6 py-3 text-sm transition-colors hover:bg-primary/80 disabled:opacity-50"
-          >
-            {loading ? 'Connexion...' : 'Se connecter'}
-            <LogIn className="h-4 w-4" />
+          <button type="submit" className="w-full rounded-lg border border-white/10 bg-white/[0.04] py-3 text-sm font-medium transition-all hover:bg-white/[0.08]">
+            Se connecter
           </button>
         </form>
       </div>

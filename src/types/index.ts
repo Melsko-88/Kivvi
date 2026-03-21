@@ -48,6 +48,31 @@ export interface DevisFormData {
   features: string[]
 }
 
+export interface BriefData {
+  projects: string[]
+  organization: {
+    name: string
+    sector: string
+    hasWebsite: boolean
+    websiteUrl?: string
+  }
+  sectorQuestions: Record<string, boolean>
+  style: string
+  identity: {
+    hasLogo: boolean
+    logoUrl?: string
+    colors: string[]
+  }
+  budget: string
+  deadline: string
+  contact: {
+    name: string
+    phone: string
+    email?: string
+    preferWhatsApp: boolean
+  }
+}
+
 export interface Quote {
   id: string
   type: string
@@ -63,6 +88,8 @@ export interface Quote {
   created_at: string
   updated_at: string
   notes?: string
+  brief_data?: BriefData
+  brief_token?: string
 }
 
 export interface Project {
@@ -99,6 +126,41 @@ export interface InvoiceItem {
   quantity: number
   unit_price: number
   total: number
+}
+
+export interface ProDevisData {
+  numero: string
+  date: string
+  validite: string
+  client: {
+    nom: string
+    structure?: string
+    telephone: string
+    email?: string
+  }
+  contexte: string
+  prestations: {
+    titre: string
+    details: string
+    montant: number
+  }[]
+  sousTotal: number
+  remise?: { taux: number; montant: number } | null
+  total: number
+  echeancier: {
+    etape: string
+    montant: number
+  }[]
+  delai: string
+  planning?: {
+    etape: string
+    duree: string
+  }[]
+  inclus: string[]
+  options?: {
+    titre: string
+    montant: number
+  }[]
 }
 
 export interface DashboardStats {

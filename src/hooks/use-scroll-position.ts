@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export function useScrollPosition() {
   const [scrollY, setScrollY] = useState(0)

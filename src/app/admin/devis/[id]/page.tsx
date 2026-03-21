@@ -1,162 +1,197 @@
-"use client"
+'use client'
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Save, Trash2 } from 'lucide-react'
-import { formatDate } from '@/lib/format'
 import type { Quote } from '@/types'
-import { cn } from '@/lib/utils'
+import { formatDate } from '@/lib/format'
+import { ArrowLeft, Save, Download, FileText, Copy, Check } from 'lucide-react'
+import type { BriefData } from '@/types'
+import { DEVIS_TYPES, BUDGET_RANGES } from '@/lib/constants'
+import Link from 'next/link'
+import { generateQuotePDF } from '@/lib/pdf'
 
-const STATUSES = [
-  { value: 'new', label: 'Nouveau', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
-  { value: 'contacted', label: 'Contacté', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' },
-  { value: 'in_progress', label: 'En cours', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30' },
-  { value: 'accepted', label: 'Accepté', color: 'bg-green-500/10 text-green-400 border-green-500/30' },
-  { value: 'rejected', label: 'Refusé', color: 'bg-red-500/10 text-red-400 border-red-500/30' },
-]
+const STATUSES = ['new', 'contacted', 'in_progress', 'accepted', 'rejected'] as const
 
-export default function QuoteDetailPage() {
-  const params = useParams()
+export default function AdminDevisDetailPage() {
+  const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const [quote, setQuote] = useState<Quote | null>(null)
   const [status, setStatus] = useState('')
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    fetch(`/api/admin/quotes/${params.id}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setQuote(data)
-        setStatus(data.status)
-        setNotes(data.notes || '')
-      })
-  }, [params.id])
+    fetch(`/api/admin/quotes/${id}`).then(r => r.json()).then(q => { setQuote(q); setStatus(q.status); setNotes(q.notes || '') })
+  }, [id])
 
-  async function handleSave() {
+  const handleSave = async () => {
     setSaving(true)
-    await fetch(`/api/admin/quotes/${params.id}`, {
+    await fetch(`/api/admin/quotes/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status, notes }),
     })
     setSaving(false)
-  }
-
-  async function handleDelete() {
-    if (!confirm('Supprimer ce devis ?')) return
-    await fetch(`/api/admin/quotes/${params.id}`, { method: 'DELETE' })
     router.push('/admin/devis')
   }
 
-  if (!quote) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (!quote) return <div className="flex justify-center py-20"><div className="h-6 w-6 animate-spin rounded-full border-2 border-white/10 border-t-white/40" /></div>
 
   return (
-    <div className="max-w-3xl space-y-6">
-      <button
-        onClick={() => router.push('/admin/devis')}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" /> Retour aux devis
-      </button>
-
-      <div className="flex items-center justify-between">
-        <h2 className="font-[family-name:var(--font-heading)] text-2xl font-bold">
-          Devis — {quote.name}
-        </h2>
-        <button
-          onClick={handleDelete}
-          className="flex items-center gap-1.5 text-sm text-red-400 hover:text-red-300 transition-colors"
-        >
-          <Trash2 className="h-4 w-4" /> Supprimer
-        </button>
-      </div>
-
-      {/* Info */}
-      <div className="glass-card p-6 rounded-xl space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <InfoRow label="Nom" value={quote.name} />
-          <InfoRow label="Email" value={quote.email} />
-          <InfoRow label="Téléphone" value={quote.phone} />
-          <InfoRow label="Entreprise" value={quote.company || '—'} />
-          <InfoRow label="Type" value={quote.type} />
-          <InfoRow label="Budget" value={quote.budget} />
-          <InfoRow label="Délai" value={quote.deadline || '—'} />
-          <InfoRow label="Date" value={formatDate(quote.created_at)} />
-        </div>
-
-        <div>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Description</p>
-          <p className="text-sm text-foreground whitespace-pre-wrap">{quote.description}</p>
-        </div>
-
-        {quote.features && quote.features.length > 0 && (
-          <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Fonctionnalités</p>
-            <div className="flex flex-wrap gap-1.5">
-              {quote.features.map((f) => (
-                <span key={f} className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full">{f}</span>
-              ))}
+    <div>
+      <Link href="/admin/devis" className="mb-6 inline-flex items-center gap-2 text-sm text-white/30 hover:text-white/50"><ArrowLeft size={14} />Retour</Link>
+      <h1 className="mb-6 font-[family-name:var(--font-heading)] text-2xl font-bold">Devis de {quote.name}</h1>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-4 rounded-xl border border-white/[0.04] bg-white/[0.015] p-6">
+          <h2 className="text-xs font-medium uppercase tracking-[0.15em] text-white/25">Informations</h2>
+          {[
+            ['Type', quote.type], ['Email', quote.email], ['Téléphone', quote.phone],
+            ['Entreprise', quote.company || '—'], ['Budget', quote.budget],
+            ['Deadline', quote.deadline || '—'], ['Date', formatDate(quote.created_at)],
+          ].map(([l, v]) => (
+            <div key={l}><span className="text-xs text-white/25">{l}</span><p className="text-sm text-white/60">{v}</p></div>
+          ))}
+          {quote.features.length > 0 && (
+            <div><span className="text-xs text-white/25">Fonctionnalités</span>
+              <div className="mt-1 flex flex-wrap gap-1">{quote.features.map(f => <span key={f} className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-xs text-white/40">{f}</span>)}</div>
             </div>
+          )}
+          <div><span className="text-xs text-white/25">Description</span><p className="mt-1 text-sm leading-relaxed text-white/50">{quote.description}</p></div>
+        </div>
+        {quote.brief_data && <BriefDataPanel brief={quote.brief_data} />}
+        <div className="space-y-4 rounded-xl border border-white/[0.04] bg-white/[0.015] p-6">
+          <h2 className="text-xs font-medium uppercase tracking-[0.15em] text-white/25">Actions</h2>
+          <div>
+            <label className="mb-1 block text-xs text-white/30">Status</label>
+            <select value={status} onChange={e => setStatus(e.target.value)} className="glass-input w-full appearance-none px-3 py-2 text-sm text-white">
+              {STATUSES.map(s => <option key={s} value={s} className="bg-[#0A0A0A]">{s}</option>)}
+            </select>
           </div>
-        )}
-      </div>
-
-      {/* Status + Notes */}
-      <div className="glass-card p-6 rounded-xl space-y-4">
-        <div>
-          <p className="text-sm font-medium mb-3">Statut</p>
-          <div className="flex flex-wrap gap-2">
-            {STATUSES.map((s) => (
-              <button
-                key={s.value}
-                onClick={() => setStatus(s.value)}
-                className={cn(
-                  'px-3 py-1.5 rounded-full text-xs font-medium border transition-all',
-                  status === s.value ? s.color : 'border-border text-muted-foreground hover:text-foreground'
-                )}
-              >
-                {s.label}
-              </button>
-            ))}
+          <div>
+            <label className="mb-1 block text-xs text-white/30">Notes internes</label>
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={6} className="glass-input w-full resize-none px-3 py-2 text-sm text-white" />
+          </div>
+          <div className="flex gap-3">
+            <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-5 py-2 text-sm transition-all hover:bg-white/[0.08] disabled:opacity-50">
+              <Save size={14} />{saving ? 'Enregistrement...' : 'Enregistrer'}
+            </button>
+            <button onClick={() => generateQuotePDF(quote)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-5 py-2 text-sm transition-all hover:bg-white/[0.08]">
+              <Download size={14} />PDF
+            </button>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(formatBriefForClaude(quote))
+                setCopied(true)
+                setTimeout(() => setCopied(false), 2000)
+              }}
+              className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-5 py-2 text-sm transition-all hover:bg-white/[0.08]"
+            >
+              {copied ? <><Check size={14} className="text-green-400" />Copié !</> : <><Copy size={14} />Claude</>}
+            </button>
           </div>
         </div>
-
-        <div>
-          <p className="text-sm font-medium mb-1.5">Notes internes</p>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={4}
-            className="w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors resize-none"
-            placeholder="Ajouter des notes..."
-          />
-        </div>
-
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/80 transition-colors disabled:opacity-50"
-        >
-          <Save className="h-4 w-4" />
-          {saving ? 'Enregistrement...' : 'Enregistrer'}
-        </button>
       </div>
     </div>
   )
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+// ─── Format brief for Claude Project ─────────────────────────────────
+
+function formatBriefForClaude(quote: Quote): string {
+  const brief = quote.brief_data
+  const budgetLabel = BUDGET_RANGES.find(b => b.value === quote.budget)?.label || quote.budget
+
+  // If it's a brief form submission
+  if (brief) {
+    const projectLabels = (brief.projects || []).map(p => {
+      const found = DEVIS_TYPES.find(t => t.value === p)
+      return found?.label || p
+    })
+    const activeNeeds = Object.entries(brief.sectorQuestions || {})
+      .filter(([, v]) => v)
+      .map(([k]) => k)
+    const styleLabel = STYLE_LABELS[brief.style] || brief.style
+
+    return `Génère un devis pour ce brief client :
+
+PROJETS : ${projectLabels.join(', ')}
+STRUCTURE : ${brief.organization?.name} (${brief.organization?.sector})
+${brief.organization?.hasWebsite ? `SITE EXISTANT : ${brief.organization?.websiteUrl || 'Oui'}` : 'PAS DE SITE EXISTANT'}
+${activeNeeds.length > 0 ? `BESOINS SPÉCIFIQUES : ${activeNeeds.join(', ')}` : ''}
+STYLE VISUEL : ${styleLabel}
+LOGO : ${brief.identity?.hasLogo ? (brief.identity?.logoUrl || 'Oui, a un logo') : 'Non, pas de logo'}
+${brief.identity?.colors && brief.identity.colors.length > 0 ? `COULEURS : ${brief.identity.colors.join(', ')}` : ''}
+BUDGET : ${budgetLabel}
+${brief.contact?.name ? `CONTACT : ${brief.contact.name}` : `CONTACT : ${quote.name}`}
+TÉLÉPHONE : ${brief.contact?.phone || quote.phone}
+${brief.contact?.email || quote.email ? `EMAIL : ${brief.contact?.email || quote.email}` : ''}
+WHATSAPP : ${brief.contact?.preferWhatsApp ? 'Oui' : 'Non'}
+${quote.deadline ? `DEADLINE : ${quote.deadline}` : ''}
+${quote.description ? `DESCRIPTION : ${quote.description}` : ''}
+
+ID Devis : ${quote.id}`
+  }
+
+  // Fallback for classic devis form
+  return `Génère un devis pour ce client :
+
+TYPE : ${DEVIS_TYPES.find(t => t.value === quote.type)?.label || quote.type}
+NOM : ${quote.name}
+${quote.company ? `ENTREPRISE : ${quote.company}` : ''}
+TÉLÉPHONE : ${quote.phone}
+${quote.email ? `EMAIL : ${quote.email}` : ''}
+BUDGET : ${budgetLabel}
+${quote.deadline ? `DEADLINE : ${quote.deadline}` : ''}
+${quote.features.length > 0 ? `FONCTIONNALITÉS : ${quote.features.join(', ')}` : ''}
+DESCRIPTION : ${quote.description}
+
+ID Devis : ${quote.id}`
+}
+
+const STYLE_LABELS: Record<string, string> = {
+  moderne: 'Moderne & Minimaliste',
+  corporate: 'Corporate & Institutionnel',
+  chaleureux: 'Coloré & Chaleureux',
+  premium: 'Premium & Élégant',
+}
+
+function BriefDataPanel({ brief }: { brief: BriefData }) {
+  const activeNeeds = Object.entries(brief.sectorQuestions || {})
+    .filter(([, v]) => v)
+    .map(([k]) => k)
+
   return (
-    <div>
-      <p className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">{label}</p>
-      <p className="text-sm">{value}</p>
+    <div className="space-y-4 rounded-xl border border-white/[0.04] bg-white/[0.015] p-6 lg:col-span-2">
+      <h2 className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.15em] text-white/25">
+        <FileText size={14} /> Brief détaillé
+      </h2>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div><span className="text-xs text-white/25">Projets</span><p className="text-sm text-white/60">{brief.projects?.join(', ')}</p></div>
+        <div><span className="text-xs text-white/25">Structure</span><p className="text-sm text-white/60">{brief.organization?.name} ({brief.organization?.sector})</p></div>
+        {brief.organization?.hasWebsite && <div><span className="text-xs text-white/25">Site existant</span><p className="text-sm text-white/60">{brief.organization?.websiteUrl || 'Oui'}</p></div>}
+        <div><span className="text-xs text-white/25">Style visuel</span><p className="text-sm text-white/60">{STYLE_LABELS[brief.style] || brief.style}</p></div>
+        <div><span className="text-xs text-white/25">Logo</span><p className="text-sm text-white/60">{brief.identity?.hasLogo ? (brief.identity?.logoUrl || 'Oui') : 'Non'}</p></div>
+        {brief.identity?.colors && brief.identity.colors.length > 0 && (
+          <div>
+            <span className="text-xs text-white/25">Couleurs</span>
+            <div className="mt-1 flex gap-1.5">
+              {brief.identity.colors.map(c => (
+                <div key={c} className="h-5 w-5 rounded-md border border-white/10" style={{ backgroundColor: c }} />
+              ))}
+            </div>
+          </div>
+        )}
+        {activeNeeds.length > 0 && (
+          <div className="sm:col-span-2">
+            <span className="text-xs text-white/25">Besoins spécifiques</span>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {activeNeeds.map(n => <span key={n} className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-xs text-white/40">{n}</span>)}
+            </div>
+          </div>
+        )}
+        <div><span className="text-xs text-white/25">WhatsApp préféré</span><p className="text-sm text-white/60">{brief.contact?.preferWhatsApp ? 'Oui' : 'Non'}</p></div>
+      </div>
     </div>
   )
 }

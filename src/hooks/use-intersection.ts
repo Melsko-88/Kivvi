@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useEffect, useRef, useState } from 'react'
 
@@ -10,11 +10,11 @@ interface UseIntersectionOptions {
 
 export function useIntersection({
   threshold = 0.1,
-  rootMargin = '0px',
+  rootMargin = '0px 0px -80px 0px',
   once = true,
 }: UseIntersectionOptions = {}) {
   const ref = useRef<HTMLDivElement>(null)
-  const [isInView, setIsInView] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     const element = ref.current
@@ -23,18 +23,18 @@ export function useIntersection({
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsInView(true)
+          setIsVisible(true)
           if (once) observer.unobserve(element)
         } else if (!once) {
-          setIsInView(false)
+          setIsVisible(false)
         }
       },
       { threshold, rootMargin }
     )
 
     observer.observe(element)
-    return () => observer.unobserve(element)
+    return () => observer.disconnect()
   }, [threshold, rootMargin, once])
 
-  return { ref, isInView }
+  return { ref, isVisible }
 }

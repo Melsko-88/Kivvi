@@ -1,8 +1,6 @@
-"use client"
-
 import { Navbar } from '@/components/shared/navbar'
 import { Footer } from '@/components/shared/footer'
-import { WhatsAppButton } from '@/components/shared/whatsapp-button'
+import { CursorGlow } from '@/components/shared/cursor-glow'
 
 export default function PublicLayout({
   children,
@@ -11,10 +9,10 @@ export default function PublicLayout({
 }) {
   return (
     <>
+      <CursorGlow />
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className="relative min-h-screen">{children}</main>
       <Footer />
-      <WhatsAppButton />
     </>
   )
 }

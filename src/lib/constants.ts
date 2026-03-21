@@ -220,23 +220,47 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     url: 'https://4treeafrique.com/',
     technologies: ['Astro', 'JavaScript', 'CSS'],
     category: 'E-Commerce',
-    image: '/portfolio/4tree-afrique.jpg',
+    image: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774051272/kivvi/portfolio/4tree-afrique.jpg',
   },
   {
-    name: 'Mon Environnement',
-    description: 'Blog environnemental dédié à la sensibilisation et l\'information écologique.',
+    name: 'Ecoinsight',
+    description: 'Plateforme dédiée à l\'écoresponsabilité, aux initiatives durables et à la sensibilisation environnementale.',
     url: 'https://monenvironnement.com/',
     technologies: ['WordPress', 'Elementor'],
     category: 'Site Vitrine',
-    image: '/portfolio/mon-environnement.jpg',
+    image: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774051274/kivvi/portfolio/ecoinsight.jpg',
   },
   {
     name: 'Teranga Smile',
-    description: 'Boutique en ligne de produits cosmétiques naturels du Sénégal.',
+    description: 'Boutique en ligne de produits cosmétiques et soins dentaires naturels.',
     url: 'https://terangasmile.store/',
     technologies: ['Astro', 'JavaScript'],
     category: 'E-Commerce',
-    image: '/portfolio/teranga-smile.jpg',
+    image: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774051275/kivvi/portfolio/teranga-smile.jpg',
+  },
+  {
+    name: 'Wamana',
+    description: 'Cabinet pluridisciplinaire : accompagnement immobilier, coworking, domiciliation et projets de boulangerie.',
+    url: 'https://wamana-alppe2xxmkivxvzl.builder-preview.com/',
+    technologies: ['Astro', 'JavaScript', 'CSS'],
+    category: 'Site Vitrine',
+    image: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774126218/kivvi/portfolio/wamana.jpg',
+  },
+  {
+    name: 'Consulat du Sénégal à Abidjan',
+    description: 'Portail officiel du Consulat Général du Sénégal en Côte d\'Ivoire : services consulaires, passeports et actualités.',
+    url: 'https://www.consulsenabidjan.com/',
+    technologies: ['Bootstrap', 'JavaScript'],
+    category: 'Site Institutionnel',
+    image: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774126227/kivvi/portfolio/consulsen-abidjan.jpg',
+  },
+  {
+    name: 'Chichastore',
+    description: 'Boutique en ligne premium de chichas et accessoires au Sénégal.',
+    url: 'https://chichastore-a1a5npdlbvtl3wke.builder-preview.com/',
+    technologies: ['Astro', 'JavaScript'],
+    category: 'E-Commerce',
+    image: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774126234/kivvi/portfolio/chichastore.jpg',
   },
 ]
 
@@ -245,7 +269,32 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
 export const LOGOS = {
   flatWhite: 'https://res.cloudinary.com/dzi8whann/image/upload/v1773860287/tiak-tiak/icons/transport/weu85knulc6qrlgectbt.png',
   flatBlack: 'https://res.cloudinary.com/dzi8whann/image/upload/v1773860292/tiak-tiak/icons/transport/f9x09jm7erlmiosyqsnr.png',
+  flatBlackHorizontal: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774056753/kivvi/logos/kivvi-logo-black-horizontal.png',
   glass3D: 'https://res.cloudinary.com/dzi8whann/image/upload/v1773864166/tiak-tiak/icons/transport/daktlszjwuqzqlebfklm.png',
+} as const
+
+// ─── Freepik Illustrations (Cloudinary) ────────────────────────────
+
+export const ILLUSTRATIONS = {
+  hero: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774050068/kivvi/images/hero-abstract-tech.jpg',
+  services: {
+    web: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774054725/kivvi/images/v2/svc-web-dev-v2.jpg',
+    ecommerce: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774054729/kivvi/images/v2/svc-ecommerce-v2.jpg',
+    mobile: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774054746/kivvi/images/v2/svc-mobile-app-v2.jpg',
+    elearning: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774054749/kivvi/images/v2/svc-elearning-v2.jpg',
+    hosting: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774054756/kivvi/images/v2/svc-hosting-v2.jpg',
+    email: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774054752/kivvi/images/v2/svc-email-v2.jpg',
+    institutional: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774055117/kivvi/images/v2/svc-institutional-v2.jpg',
+    maintenance: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774055127/kivvi/images/v2/svc-maintenance-v2.jpg',
+  },
+  whyKivvi: {
+    globe: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774050309/kivvi/images/why-globe-network.jpg',
+    quality: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774050312/kivvi/images/why-quality-certification.jpg',
+    partnership: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774050315/kivvi/images/why-business-partnership.jpg',
+  },
+  about: {
+    team: 'https://res.cloudinary.com/dzi8whann/image/upload/v1774050338/kivvi/images/about-african-team.jpg',
+  },
 } as const
 
 // ─── Navigation ─────────────────────────────────────────────────────
@@ -279,7 +328,7 @@ export const TESTIMONIALS = [
   {
     name: 'Ibrahim Ndiaye',
     role: 'Responsable Communication',
-    company: 'Mon Environnement',
+    company: 'Ecoinsight',
     content: 'Un accompagnement de qualité du début à la fin. Le site reflète parfaitement notre mission environnementale avec un design moderne et impactant.',
     rating: 5,
   },

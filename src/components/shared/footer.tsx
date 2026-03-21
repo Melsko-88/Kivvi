@@ -1,112 +1,146 @@
-import Link from 'next/link'
-import { Mail, Phone, MapPin } from 'lucide-react'
-import { SITE_CONFIG, NAV_LINKS } from '@/lib/constants'
-import { Logo } from './logo'
+'use client'
 
-const legalLinks = [
-  { label: 'Mentions légales', href: '/mentions-legales' },
-  { label: 'CGV', href: '/cgv' },
-  { label: 'Confidentialité', href: '/confidentialite' },
-]
+import Link from 'next/link'
+import Image from 'next/image'
+import { Mail, Phone, MapPin } from 'lucide-react'
+import { SITE_CONFIG, LOGOS } from '@/lib/constants'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
+
+const footerLinks = {
+  services: [
+    { label: 'Site Vitrine', href: '/services' },
+    { label: 'E-Commerce', href: '/services' },
+    { label: 'Application Mobile', href: '/services' },
+    { label: 'Messagerie M365', href: '/services' },
+  ],
+  company: [
+    { label: 'Portfolio', href: '/portfolio' },
+    { label: 'Tarifs', href: '/tarifs' },
+    { label: 'Contact', href: '/contact' },
+    { label: 'Demander un devis', href: '/devis' },
+  ],
+  legal: [
+    { label: 'Mentions légales', href: '/mentions-legales' },
+    { label: 'Confidentialité', href: '/confidentialite' },
+    { label: 'CGV', href: '/cgv' },
+  ],
+}
 
 export function Footer() {
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  const logoSrc = mounted && resolvedTheme === 'light' ? LOGOS.flatBlack : LOGOS.flatWhite
+
   return (
-    <footer className="bg-[#0A0A0A] text-[#F5F2ED]">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Brand */}
-          <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Logo variant="light" size={32} />
-              <span className="font-[family-name:var(--font-heading)] text-lg font-bold text-[#F5F2ED]">KIVVI</span>
-            </Link>
-            <p className="text-sm text-[#999] leading-relaxed">
-              Agence digitale africaine. Nous concevons des solutions web et mobiles premium pour les entreprises et institutions.
+    <footer className="relative border-t border-foreground/[0.04]">
+      {/* Main Footer */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10 sm:py-16 lg:py-20">
+        <div className="grid gap-8 sm:gap-10 lg:grid-cols-12 lg:gap-8">
+          {/* Brand Column */}
+          <div className="lg:col-span-4">
+            <Image
+              src={logoSrc}
+              alt="KIVVI"
+              width={160}
+              height={50}
+              className="mb-5 h-14 w-auto opacity-90"
+            />
+            <p className="mb-6 max-w-xs text-sm leading-relaxed text-foreground/40">
+              Agence digitale africaine. Nous concevons des expériences
+              numériques premium qui font la différence.
             </p>
+            <div className="flex flex-col gap-3">
+              <a
+                href={`mailto:${SITE_CONFIG.email}`}
+                className="flex items-center gap-2.5 text-sm text-foreground/40 transition-colors hover:text-foreground/70"
+              >
+                <Mail size={14} className="shrink-0" />
+                {SITE_CONFIG.email}
+              </a>
+              <a
+                href={`tel:${SITE_CONFIG.phone.replace(/\s/g, '')}`}
+                className="flex items-center gap-2.5 text-sm text-foreground/40 transition-colors hover:text-foreground/70"
+              >
+                <Phone size={14} className="shrink-0" />
+                {SITE_CONFIG.phone}
+              </a>
+              <span className="flex items-center gap-2.5 text-sm text-foreground/40">
+                <MapPin size={14} className="shrink-0" />
+                {SITE_CONFIG.location}
+              </span>
+            </div>
           </div>
 
-          {/* Navigation */}
-          <div>
-            <h3 className="font-[family-name:var(--font-heading)] text-sm font-semibold uppercase tracking-wider text-[#999] mb-4">
-              Navigation
-            </h3>
-            <ul className="space-y-2.5">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-[#999] hover:text-[#F5F2ED] transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Links Columns */}
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-8">
+            <div>
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-foreground/25">
+                Services
+              </h4>
+              <ul className="space-y-2.5">
+                {footerLinks.services.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-foreground/40 transition-colors hover:text-foreground/70"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="font-[family-name:var(--font-heading)] text-sm font-semibold uppercase tracking-wider text-[#999] mb-4">
-              Contact
-            </h3>
-            <ul className="space-y-3">
-              <li>
-                <a
-                  href={`mailto:${SITE_CONFIG.email}`}
-                  className="flex items-center gap-2 text-sm text-[#999] hover:text-[#F5F2ED] transition-colors"
-                >
-                  <Mail className="h-4 w-4 text-copper" />
-                  {SITE_CONFIG.email}
-                </a>
-              </li>
-              <li>
-                <a
-                  href={`tel:${SITE_CONFIG.phone.replace(/\s/g, '')}`}
-                  className="flex items-center gap-2 text-sm text-[#999] hover:text-[#F5F2ED] transition-colors"
-                >
-                  <Phone className="h-4 w-4 text-copper" />
-                  {SITE_CONFIG.phone}
-                </a>
-              </li>
-              <li className="flex items-start gap-2 text-sm text-[#999]">
-                <MapPin className="h-4 w-4 text-copper mt-0.5" />
-                <span>
-                  {SITE_CONFIG.location}
-                  <br />
-                  {SITE_CONFIG.locationSecondary}
-                </span>
-              </li>
-            </ul>
-          </div>
+            <div>
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-foreground/25">
+                Entreprise
+              </h4>
+              <ul className="space-y-2.5">
+                {footerLinks.company.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-foreground/40 transition-colors hover:text-foreground/70"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Legal */}
-          <div>
-            <h3 className="font-[family-name:var(--font-heading)] text-sm font-semibold uppercase tracking-wider text-[#999] mb-4">
-              Légal
-            </h3>
-            <ul className="space-y-2.5">
-              {legalLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-[#999] hover:text-[#F5F2ED] transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-4 text-xs text-[#666]">
-              <p>RCCM : {SITE_CONFIG.rccm}</p>
-              <p>NINEA : {SITE_CONFIG.ninea}</p>
+            <div>
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-foreground/25">
+                Juridique
+              </h4>
+              <ul className="space-y-2.5">
+                {footerLinks.legal.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-foreground/40 transition-colors hover:text-foreground/70"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Bottom */}
-        <div className="mt-12 pt-8 border-t border-[#2A2A2A]">
-          <p className="text-center text-xs text-[#666]">
-            &copy; {new Date().getFullYear()} {SITE_CONFIG.name}. Tous droits réservés.
+      {/* Bottom Bar */}
+      <div className="border-t border-foreground/[0.04]">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-6 sm:flex-row">
+          <p className="text-xs text-foreground/25">
+            &copy; {new Date().getFullYear()} KIVVI. Tous droits réservés.
+          </p>
+          <p className="text-xs text-foreground/25">
+            RCCM {SITE_CONFIG.rccm} &middot; NINEA {SITE_CONFIG.ninea}
           </p>
         </div>
       </div>

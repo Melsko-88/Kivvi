@@ -1,8 +1,8 @@
+import type { Metadata } from 'next'
 import { createMetadata } from '@/lib/metadata'
-import { PageHeader } from '@/components/shared/page-header'
 import { SITE_CONFIG } from '@/lib/constants'
 
-export const metadata = createMetadata({
+export const metadata: Metadata = createMetadata({
   title: 'Conditions Générales de Vente',
   description: 'CGV de KIVVI — Agence Digitale Africaine',
   path: '/cgv',
@@ -10,69 +10,76 @@ export const metadata = createMetadata({
 
 export default function CGVPage() {
   return (
-    <>
-      <PageHeader title="Conditions Générales de Vente" />
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl prose prose-neutral prose-sm">
-          <h2>1. Objet</h2>
-          <p>
-            Les présentes conditions générales de vente régissent les relations contractuelles entre
-            {' '}{SITE_CONFIG.name} et ses clients dans le cadre de la fourniture de services digitaux
-            (création de sites web, applications mobiles, hébergement, maintenance, etc.).
-          </p>
+    <div className="pt-24 sm:pt-32 pb-16 sm:pb-24">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+        <h1 className="mb-10 font-[family-name:var(--font-heading)] text-3xl font-bold">
+          Conditions Générales de Vente
+        </h1>
+        <div className="space-y-8 text-sm leading-relaxed text-foreground/50">
+          <section>
+            <h2 className="mb-3 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground/80">
+              Objet
+            </h2>
+            <p>
+              Les présentes CGV régissent les relations commerciales entre{' '}
+              {SITE_CONFIG.name}, {SITE_CONFIG.location}, et ses clients dans le
+              cadre de prestations de services digitaux.
+            </p>
+          </section>
 
-          <h2>2. Devis et commande</h2>
-          <p>
-            Tout projet fait l&apos;objet d&apos;un devis gratuit et détaillé. Le devis est valable 30 jours
-            à compter de sa date d&apos;émission. La commande est considérée comme ferme après acceptation
-            du devis et versement de l&apos;acompte.
-          </p>
+          <section>
+            <h2 className="mb-3 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground/80">
+              Devis et commande
+            </h2>
+            <p>
+              Tout projet fait l&apos;objet d&apos;un devis détaillé gratuit. La commande
+              est considérée comme ferme après acceptation du devis et versement
+              de l&apos;acompte initial (40% du montant total).
+            </p>
+          </section>
 
-          <h2>3. Tarifs et paiement</h2>
-          <p>
-            Les prix sont exprimés en Francs CFA (XOF) hors taxes. Le paiement s&apos;effectue selon
-            l&apos;échéancier suivant : 40% à la commande, 30% à la validation des maquettes,
-            30% à la livraison finale. Modes de paiement acceptés : virement bancaire, Wave, Orange Money.
-          </p>
+          <section>
+            <h2 className="mb-3 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground/80">
+              Modalités de paiement
+            </h2>
+            <p>
+              Le paiement s&apos;effectue en trois étapes : 40% à la commande, 30% à
+              la validation des maquettes, 30% à la livraison. Moyens acceptés :
+              virement bancaire, Wave, Orange Money, espèces.
+            </p>
+          </section>
 
-          <h2>4. Délais de livraison</h2>
-          <p>
-            Les délais indiqués dans le devis sont donnés à titre indicatif. Tout retard imputable
-            au client (validation tardive, fourniture de contenus) reportera d&apos;autant le délai de livraison.
-          </p>
+          <section>
+            <h2 className="mb-3 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground/80">
+              Délais de livraison
+            </h2>
+            <p>
+              Les délais sont indicatifs et communiqués dans le devis. Tout retard
+              éventuel sera communiqué au client dans les meilleurs délais.
+            </p>
+          </section>
 
-          <h2>5. Propriété intellectuelle</h2>
-          <p>
-            Le client devient propriétaire des livrables après paiement intégral. {SITE_CONFIG.name}
-            {' '}se réserve le droit de mentionner la réalisation dans son portfolio, sauf opposition écrite du client.
-          </p>
+          <section>
+            <h2 className="mb-3 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground/80">
+              Propriété intellectuelle
+            </h2>
+            <p>
+              Après paiement intégral, le client acquiert la propriété des
+              livrables spécifiques à son projet. Les outils, frameworks et
+              composants réutilisables restent la propriété de {SITE_CONFIG.name}.
+            </p>
+          </section>
 
-          <h2>6. Garantie et maintenance</h2>
-          <p>
-            Une période de garantie est incluse après la livraison (durée selon le forfait choisi).
-            Au-delà, un contrat de maintenance peut être souscrit.
-          </p>
-
-          <h2>7. Responsabilité</h2>
-          <p>
-            {SITE_CONFIG.name} s&apos;engage à mettre en œuvre les moyens nécessaires pour fournir un service
-            de qualité. La responsabilité est limitée au montant du contrat.
-          </p>
-
-          <h2>8. Résiliation</h2>
-          <p>
-            En cas de résiliation par le client, les sommes déjà versées restent acquises à {SITE_CONFIG.name}.
-            En cas de résiliation par {SITE_CONFIG.name}, les sommes versées pour les travaux non réalisés
-            seront remboursées.
-          </p>
-
-          <h2>9. Droit applicable</h2>
-          <p>
-            Les présentes CGV sont soumises au droit sénégalais. Tout litige sera soumis aux tribunaux
-            compétents de Kaolack.
-          </p>
+          <section>
+            <h2 className="mb-3 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground/80">
+              Contact
+            </h2>
+            <p>
+              Pour toute question relative aux présentes CGV : {SITE_CONFIG.email}
+            </p>
+          </section>
         </div>
-      </section>
-    </>
+      </div>
+    </div>
   )
 }

@@ -1,12 +1,10 @@
-"use client"
+'use client'
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Send, CheckCircle, AlertCircle } from 'lucide-react'
 import { contactSchema, type ContactFormValues } from '@/lib/schemas'
-import { Button } from '@/components/shared/button'
-import { cn } from '@/lib/utils'
+import { Send, CheckCircle, AlertCircle } from 'lucide-react'
 
 export function ContactForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -20,7 +18,7 @@ export function ContactForm() {
     resolver: zodResolver(contactSchema),
   })
 
-  async function onSubmit(data: ContactFormValues) {
+  const onSubmit = async (data: ContactFormValues) => {
     setStatus('loading')
     try {
       const res = await fetch('/api/contact', {
@@ -38,100 +36,115 @@ export function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="bg-[#F3F1EE] border border-[#E8E5E0] p-10 rounded-xl text-center">
-        <CheckCircle className="h-12 w-12 text-[#4A7C59] mx-auto mb-4" />
-        <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#1A1A1A] mb-2">Message envoyé !</h3>
-        <p className="text-[#6B6B6B]">Nous vous répondrons dans les plus brefs délais.</p>
-        <button
-          onClick={() => setStatus('idle')}
-          className="mt-6 text-sm text-copper hover:underline"
-        >
-          Envoyer un autre message
-        </button>
+      <div className="flex flex-col items-center rounded-2xl border border-foreground/[0.04] bg-foreground/[0.015] p-10 text-center">
+        <CheckCircle size={40} className="mb-4 text-foreground/30" strokeWidth={1} />
+        <h3 className="mb-2 font-[family-name:var(--font-heading)] text-xl font-bold">
+          Message envoyé
+        </h3>
+        <p className="text-sm text-foreground/40">
+          Merci ! Nous vous répondrons dans les plus brefs délais.
+        </p>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="bg-white border border-[#E8E5E0] p-8 rounded-xl space-y-5">
-      <h2 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#1A1A1A] mb-2">Envoyez-nous un message</h2>
-
-      {status === 'error' && (
-        <div className="flex items-center gap-2 text-sm text-[#C75050] bg-[#C75050]/10 px-4 py-3 rounded-lg">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          Une erreur est survenue. Veuillez réessayer.
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Nom complet *</label>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+            Nom *
+          </label>
           <input
             {...register('name')}
-            className={cn(
-              'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors',
-              errors.name && 'border-[#C75050]'
-            )}
+            className="glass-input w-full px-4 py-3 text-sm text-foreground placeholder-foreground/20"
             placeholder="Votre nom"
           />
-          {errors.name && <p className="text-xs text-[#C75050] mt-1">{errors.name.message}</p>}
+          {errors.name && (
+            <p className="mt-1 text-xs text-red-400/60">{errors.name.message}</p>
+          )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Email *</label>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+            Email *
+          </label>
           <input
             {...register('email')}
             type="email"
-            className={cn(
-              'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors',
-              errors.email && 'border-[#C75050]'
-            )}
-            placeholder="votre@email.com"
+            className="glass-input w-full px-4 py-3 text-sm text-foreground placeholder-foreground/20"
+            placeholder="email@exemple.com"
           />
-          {errors.email && <p className="text-xs text-[#C75050] mt-1">{errors.email.message}</p>}
+          {errors.email && (
+            <p className="mt-1 text-xs text-red-400/60">{errors.email.message}</p>
+          )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Téléphone</label>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+            Téléphone
+          </label>
           <input
             {...register('phone')}
-            className="w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors"
-            placeholder="+221 77 xxx xx xx"
+            className="glass-input w-full px-4 py-3 text-sm text-foreground placeholder-foreground/20"
+            placeholder="+221 77 000 00 00"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Sujet *</label>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+            Sujet *
+          </label>
           <input
             {...register('subject')}
-            className={cn(
-              'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors',
-              errors.subject && 'border-[#C75050]'
-            )}
-            placeholder="Sujet de votre message"
+            className="glass-input w-full px-4 py-3 text-sm text-foreground placeholder-foreground/20"
+            placeholder="Objet de votre message"
           />
-          {errors.subject && <p className="text-xs text-[#C75050] mt-1">{errors.subject.message}</p>}
+          {errors.subject && (
+            <p className="mt-1 text-xs text-red-400/60">{errors.subject.message}</p>
+          )}
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Message *</label>
+        <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+          Message *
+        </label>
         <textarea
           {...register('message')}
           rows={5}
-          className={cn(
-            'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors resize-none',
-            errors.message && 'border-[#C75050]'
-          )}
-          placeholder="Décrivez votre besoin..."
+          className="glass-input w-full resize-none px-4 py-3 text-sm text-foreground placeholder-foreground/20"
+          placeholder="Décrivez votre projet ou posez votre question..."
         />
-        {errors.message && <p className="text-xs text-[#C75050] mt-1">{errors.message.message}</p>}
+        {errors.message && (
+          <p className="mt-1 text-xs text-red-400/60">{errors.message.message}</p>
+        )}
       </div>
 
-      <Button type="submit" variant="primary" disabled={status === 'loading'}>
-        {status === 'loading' ? 'Envoi en cours...' : 'Envoyer le message'}
-        <Send className="h-4 w-4" />
-      </Button>
+      {status === 'error' && (
+        <div className="flex items-center gap-2 text-sm text-red-400/60">
+          <AlertCircle size={14} />
+          Une erreur est survenue. Veuillez réessayer.
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={status === 'loading'}
+        className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/[0.04] px-7 py-3 text-sm font-medium transition-all hover:border-foreground/20 hover:bg-foreground/[0.08] disabled:opacity-50"
+      >
+        {status === 'loading' ? (
+          <>
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground/60" />
+            Envoi...
+          </>
+        ) : (
+          <>
+            <Send size={14} />
+            Envoyer le message
+          </>
+        )}
+      </button>
     </form>
   )
 }

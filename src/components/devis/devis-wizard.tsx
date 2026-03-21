@@ -1,27 +1,32 @@
-"use client"
+'use client'
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, ArrowRight, Send, CheckCircle, AlertCircle } from 'lucide-react'
 import { devisSchema, type DevisFormValues } from '@/lib/schemas'
 import { DEVIS_TYPES, BUDGET_RANGES } from '@/lib/constants'
-import { Button } from '@/components/shared/button'
-import { cn } from '@/lib/utils'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  ArrowRight,
+  ArrowLeft,
+  Send,
+  CheckCircle,
+  AlertCircle,
+} from 'lucide-react'
 
-const STEPS = ['Type de projet', 'Description', 'Budget', 'Vos coordonnées']
+const STEPS = ['Projet', 'Détails', 'Contact']
 
-const FEATURE_OPTIONS = [
-  'Design sur mesure',
-  'Multi-langue',
+const FEATURES_OPTIONS = [
+  'Design responsive',
   'Paiement en ligne',
-  'Espace administration',
+  'Multi-langue',
   'Blog / Actualités',
-  'SEO avancé',
-  'Notifications',
-  'Mode hors-ligne',
+  'Espace membre',
+  'Tableau de bord',
+  'Notifications push',
   'API / Intégrations',
-  'Analytics',
+  'SEO avancé',
+  'Maintenance',
 ]
 
 export function DevisWizard() {
@@ -33,47 +38,38 @@ export function DevisWizard() {
     handleSubmit,
     watch,
     setValue,
-    trigger,
     formState: { errors },
+    trigger,
   } = useForm<DevisFormValues>({
     resolver: zodResolver(devisSchema),
     defaultValues: {
-      type: '',
-      name: '',
-      email: '',
-      phone: '',
-      company: '',
-      description: '',
-      budget: '',
-      deadline: '',
       features: [],
     },
   })
 
-  const selectedType = watch('type')
-  const selectedBudget = watch('budget')
   const selectedFeatures = watch('features') || []
+  const selectedType = watch('type')
 
-  function toggleFeature(feature: string) {
+  const toggleFeature = (feature: string) => {
     const current = selectedFeatures
-    const updated = current.includes(feature)
-      ? current.filter((f) => f !== feature)
-      : [...current, feature]
-    setValue('features', updated)
+    setValue(
+      'features',
+      current.includes(feature)
+        ? current.filter((f) => f !== feature)
+        : [...current, feature]
+    )
   }
 
-  async function nextStep() {
-    const fieldsPerStep: (keyof DevisFormValues)[][] = [
-      ['type'],
-      ['description'],
-      ['budget'],
-      ['name', 'email', 'phone'],
-    ]
-    const valid = await trigger(fieldsPerStep[step])
-    if (valid) setStep((s) => Math.min(s + 1, 3))
+  const nextStep = async () => {
+    let valid = false
+    if (step === 0) valid = await trigger(['type', 'description', 'budget'])
+    else if (step === 1) valid = await trigger(['features'])
+    else valid = true
+
+    if (valid) setStep(step + 1)
   }
 
-  async function onSubmit(data: DevisFormValues) {
+  const onSubmit = async (data: DevisFormValues) => {
     setStatus('loading')
     try {
       const res = await fetch('/api/devis', {
@@ -90,242 +86,305 @@ export function DevisWizard() {
 
   if (status === 'success') {
     return (
-      <div className="bg-[#F3F1EE] border border-[#E8E5E0] p-10 rounded-xl text-center">
-        <CheckCircle className="h-14 w-14 text-[#4A7C59] mx-auto mb-4" />
-        <h3 className="font-[family-name:var(--font-heading)] text-2xl font-bold text-[#1A1A1A] mb-2">Demande envoyée !</h3>
-        <p className="text-[#6B6B6B] max-w-md mx-auto">
-          Merci pour votre confiance. Nous étudions votre demande et vous enverrons
-          une proposition personnalisée sous 48 heures.
+      <div className="flex flex-col items-center rounded-2xl border border-foreground/[0.04] bg-foreground/[0.015] p-12 text-center">
+        <CheckCircle size={48} className="mb-6 text-foreground/30" strokeWidth={1} />
+        <h3 className="mb-3 font-[family-name:var(--font-heading)] text-2xl font-bold">
+          Demande envoyée !
+        </h3>
+        <p className="max-w-md text-sm text-foreground/40">
+          Merci pour votre demande. Nous analysons votre projet et vous
+          enverrons un devis détaillé sous 48h.
         </p>
       </div>
     )
   }
 
   return (
-    <div className="bg-white border border-[#E8E5E0] p-8 rounded-xl">
-      {/* Progress bar */}
-      <div className="mb-8">
-        <div className="flex justify-between mb-3">
-          {STEPS.map((s, i) => (
-            <span
-              key={s}
-              className={cn(
-                'text-xs font-medium transition-colors',
-                i <= step ? 'text-copper' : 'text-[#999]'
-              )}
+    <div className="rounded-2xl border border-foreground/[0.04] bg-foreground/[0.015] p-8 lg:p-10">
+      {/* Progress */}
+      <div className="mb-10 flex items-center justify-center gap-2">
+        {STEPS.map((label, i) => (
+          <div key={label} className="flex items-center gap-2">
+            <div
+              className={`flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium transition-all ${
+                i <= step
+                  ? 'border-foreground/20 bg-foreground/[0.06] text-foreground'
+                  : 'border-foreground/[0.06] text-foreground/25'
+              }`}
             >
-              {s}
+              {i + 1}
+            </div>
+            <span
+              className={`hidden text-xs sm:inline ${
+                i <= step ? 'text-foreground/60' : 'text-foreground/20'
+              }`}
+            >
+              {label}
             </span>
-          ))}
-        </div>
-        <div className="h-1 bg-[#E8E5E0] rounded-full overflow-hidden">
-          <div
-            className="h-full bg-copper rounded-full transition-all duration-500"
-            style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-          />
-        </div>
+            {i < STEPS.length - 1 && (
+              <div
+                className={`mx-2 h-px w-8 ${
+                  i < step ? 'bg-foreground/20' : 'bg-foreground/[0.06]'
+                }`}
+              />
+            )}
+          </div>
+        ))}
       </div>
 
-      {status === 'error' && (
-        <div className="flex items-center gap-2 text-sm text-[#C75050] bg-[#C75050]/10 px-4 py-3 rounded-lg mb-6">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          Une erreur est survenue. Veuillez réessayer.
-        </div>
-      )}
-
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Step 1: Type */}
-        {step === 0 && (
-          <div>
-            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#1A1A1A] mb-6">
-              Quel type de projet ?
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {DEVIS_TYPES.map((t) => (
-                <button
-                  key={t.value}
-                  type="button"
-                  onClick={() => setValue('type', t.value)}
-                  className={cn(
-                    'text-left p-4 rounded-xl border transition-all',
-                    selectedType === t.value
-                      ? 'border-copper bg-copper/5'
-                      : 'border-[#E8E5E0] bg-[#FAFAF7] hover:border-copper/40'
-                  )}
-                >
-                  <p className="font-medium text-sm text-[#1A1A1A]">{t.label}</p>
-                  <p className="text-xs text-[#6B6B6B] mt-0.5">{t.description}</p>
-                </button>
-              ))}
-            </div>
-            {errors.type && <p className="text-xs text-[#C75050] mt-2">{errors.type.message}</p>}
-          </div>
-        )}
-
-        {/* Step 2: Description + Features */}
-        {step === 1 && (
-          <div>
-            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#1A1A1A] mb-6">
-              Décrivez votre projet
-            </h3>
-            <textarea
-              {...register('description')}
-              rows={5}
-              className={cn(
-                'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-3 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors resize-none mb-5',
-                errors.description && 'border-[#C75050]'
-              )}
-              placeholder="Décrivez votre projet, vos objectifs, votre public cible..."
-            />
-            {errors.description && <p className="text-xs text-[#C75050] mb-4">{errors.description.message}</p>}
-
-            <p className="text-sm font-medium text-[#1A1A1A] mb-3">Fonctionnalités souhaitées (optionnel)</p>
-            <div className="flex flex-wrap gap-2">
-              {FEATURE_OPTIONS.map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => toggleFeature(f)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
-                    selectedFeatures.includes(f)
-                      ? 'border-copper bg-copper/10 text-copper'
-                      : 'border-[#E8E5E0] text-[#6B6B6B] hover:text-[#1A1A1A]'
-                  )}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Budget + Deadline */}
-        {step === 2 && (
-          <div>
-            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#1A1A1A] mb-6">
-              Quel est votre budget ?
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-              {BUDGET_RANGES.map((b) => (
-                <button
-                  key={b.value}
-                  type="button"
-                  onClick={() => setValue('budget', b.value)}
-                  className={cn(
-                    'text-left p-4 rounded-xl border transition-all',
-                    selectedBudget === b.value
-                      ? 'border-copper bg-copper/5'
-                      : 'border-[#E8E5E0] bg-[#FAFAF7] hover:border-copper/40'
-                  )}
-                >
-                  <p className="font-[family-name:var(--font-mono)] text-sm font-medium text-[#1A1A1A]">{b.label}</p>
-                </button>
-              ))}
-            </div>
-            {errors.budget && <p className="text-xs text-[#C75050] mb-4">{errors.budget.message}</p>}
-
-            <div>
-              <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Délai souhaité (optionnel)</label>
-              <input
-                {...register('deadline')}
-                type="text"
-                className="w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors"
-                placeholder="Ex: 1 mois, fin mars, ASAP..."
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Step 4: Contact info */}
-        {step === 3 && (
-          <div>
-            <h3 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-[#1A1A1A] mb-6">
-              Vos coordonnées
-            </h3>
-            <div className="space-y-4">
+        <AnimatePresence mode="wait">
+          {/* Step 1: Project Type */}
+          {step === 0 && (
+            <motion.div
+              key="step0"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
               <div>
-                <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Nom complet *</label>
-                <input
-                  {...register('name')}
-                  className={cn(
-                    'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors',
-                    errors.name && 'border-[#C75050]'
-                  )}
-                  placeholder="Votre nom complet"
-                />
-                {errors.name && <p className="text-xs text-[#C75050] mt-1">{errors.name.message}</p>}
+                <label className="mb-3 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+                  Type de projet *
+                </label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {DEVIS_TYPES.map((type) => (
+                    <label
+                      key={type.value}
+                      className={`cursor-pointer rounded-xl border p-4 transition-all ${
+                        selectedType === type.value
+                          ? 'border-foreground/20 bg-foreground/[0.06]'
+                          : 'border-foreground/[0.06] bg-foreground/[0.02] hover:border-foreground/[0.1]'
+                      }`}
+                    >
+                      <input
+                        {...register('type')}
+                        type="radio"
+                        value={type.value}
+                        className="hidden"
+                      />
+                      <span className="block text-sm font-medium">
+                        {type.label}
+                      </span>
+                      <span className="text-xs text-foreground/30">
+                        {type.description}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                {errors.type && (
+                  <p className="mt-2 text-xs text-red-400/60">{errors.type.message}</p>
+                )}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              <div>
+                <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+                  Description du projet *
+                </label>
+                <textarea
+                  {...register('description')}
+                  rows={4}
+                  className="glass-input w-full resize-none px-4 py-3 text-sm text-foreground placeholder-foreground/20"
+                  placeholder="Décrivez votre projet, vos objectifs, votre cible..."
+                />
+                {errors.description && (
+                  <p className="mt-1 text-xs text-red-400/60">{errors.description.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+                  Budget estimé *
+                </label>
+                <select
+                  {...register('budget')}
+                  className="glass-input w-full appearance-none px-4 py-3 text-sm text-foreground"
+                >
+                  <option value="" className="bg-card">
+                    Sélectionnez un budget
+                  </option>
+                  {BUDGET_RANGES.map((range) => (
+                    <option
+                      key={range.value}
+                      value={range.value}
+                      className="bg-card"
+                    >
+                      {range.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.budget && (
+                  <p className="mt-1 text-xs text-red-400/60">{errors.budget.message}</p>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 2: Features */}
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
+              <div>
+                <label className="mb-3 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+                  Fonctionnalités souhaitées
+                </label>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {FEATURES_OPTIONS.map((feature) => (
+                    <button
+                      key={feature}
+                      type="button"
+                      onClick={() => toggleFeature(feature)}
+                      className={`rounded-lg border px-4 py-2.5 text-left text-sm transition-all ${
+                        selectedFeatures.includes(feature)
+                          ? 'border-foreground/20 bg-foreground/[0.06] text-foreground'
+                          : 'border-foreground/[0.06] text-foreground/40 hover:border-foreground/[0.1]'
+                      }`}
+                    >
+                      {feature}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+                  Deadline souhaitée
+                </label>
+                <input
+                  {...register('deadline')}
+                  className="glass-input w-full px-4 py-3 text-sm text-foreground placeholder-foreground/20"
+                  placeholder="Ex: Fin mars 2026, Pas de deadline..."
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 3: Contact */}
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-5"
+            >
+              <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Email *</label>
+                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+                    Nom *
+                  </label>
+                  <input
+                    {...register('name')}
+                    className="glass-input w-full px-4 py-3 text-sm text-foreground placeholder-foreground/20"
+                    placeholder="Votre nom"
+                  />
+                  {errors.name && (
+                    <p className="mt-1 text-xs text-red-400/60">{errors.name.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+                    Email *
+                  </label>
                   <input
                     {...register('email')}
                     type="email"
-                    className={cn(
-                      'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors',
-                      errors.email && 'border-[#C75050]'
-                    )}
-                    placeholder="votre@email.com"
+                    className="glass-input w-full px-4 py-3 text-sm text-foreground placeholder-foreground/20"
+                    placeholder="email@exemple.com"
                   />
-                  {errors.email && <p className="text-xs text-[#C75050] mt-1">{errors.email.message}</p>}
+                  {errors.email && (
+                    <p className="mt-1 text-xs text-red-400/60">{errors.email.message}</p>
+                  )}
                 </div>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Téléphone *</label>
+                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+                    Téléphone *
+                  </label>
                   <input
                     {...register('phone')}
-                    className={cn(
-                      'w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors',
-                      errors.phone && 'border-[#C75050]'
-                    )}
-                    placeholder="+221 77 xxx xx xx"
+                    className="glass-input w-full px-4 py-3 text-sm text-foreground placeholder-foreground/20"
+                    placeholder="+221 77 000 00 00"
                   />
-                  {errors.phone && <p className="text-xs text-[#C75050] mt-1">{errors.phone.message}</p>}
+                  {errors.phone && (
+                    <p className="mt-1 text-xs text-red-400/60">{errors.phone.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.15em] text-foreground/30">
+                    Entreprise
+                  </label>
+                  <input
+                    {...register('company')}
+                    className="glass-input w-full px-4 py-3 text-sm text-foreground placeholder-foreground/20"
+                    placeholder="Nom de votre entreprise"
+                  />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">Entreprise / Organisation</label>
-                <input
-                  {...register('company')}
-                  className="w-full bg-[#FAFAF7] border border-[#E8E5E0] rounded-lg px-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#999] focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper transition-colors"
-                  placeholder="Nom de votre entreprise (optionnel)"
-                />
-              </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#E8E5E0]">
+        {/* Navigation Buttons */}
+        <div className="mt-8 flex items-center justify-between">
           {step > 0 ? (
             <button
               type="button"
-              onClick={() => setStep((s) => s - 1)}
-              className="flex items-center gap-2 text-sm text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors"
+              onClick={() => setStep(step - 1)}
+              className="flex items-center gap-2 text-sm text-foreground/40 transition-colors hover:text-foreground/70"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft size={14} />
               Retour
             </button>
           ) : (
             <div />
           )}
 
-          {step < 3 ? (
+          {step < STEPS.length - 1 ? (
             <button
               type="button"
               onClick={nextStep}
-              className="flex items-center gap-2 text-sm font-medium text-copper hover:text-copper-hover transition-colors"
+              className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/[0.04] px-6 py-2.5 text-sm font-medium transition-all hover:border-foreground/20 hover:bg-foreground/[0.08]"
             >
               Suivant
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight size={14} />
             </button>
           ) : (
-            <Button type="submit" variant="primary" disabled={status === 'loading'}>
-              {status === 'loading' ? 'Envoi en cours...' : 'Envoyer la demande'}
-              <Send className="h-4 w-4" />
-            </Button>
+            <button
+              type="submit"
+              disabled={status === 'loading'}
+              className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/[0.04] px-6 py-2.5 text-sm font-medium transition-all hover:border-foreground/20 hover:bg-foreground/[0.08] disabled:opacity-50"
+            >
+              {status === 'loading' ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground/60" />
+                  Envoi...
+                </>
+              ) : (
+                <>
+                  <Send size={14} />
+                  Envoyer la demande
+                </>
+              )}
+            </button>
           )}
         </div>
+
+        {status === 'error' && (
+          <div className="mt-4 flex items-center gap-2 text-sm text-red-400/60">
+            <AlertCircle size={14} />
+            Une erreur est survenue. Veuillez réessayer.
+          </div>
+        )}
       </form>
     </div>
   )

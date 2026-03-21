@@ -1,39 +1,30 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 
-interface UseCounterOptions {
-  end: number
-  duration?: number
-  start?: number
-  enabled?: boolean
-}
+export function useCounter(target: number, isVisible: boolean, duration = 2000) {
+  const [count, setCount] = useState(0)
 
-export function useCounter({ end, duration = 2000, start = 0, enabled = true }: UseCounterOptions) {
-  const [count, setCount] = useState(start)
+  useEffect(() => {
+    if (!isVisible) return
 
-  const animate = useCallback(() => {
-    const startTime = performance.now()
-    const range = end - start
+    let startTime: number | null = null
+    let animationFrame: number
 
-    const step = (currentTime: number) => {
-      const elapsed = currentTime - startTime
-      const progress = Math.min(elapsed / duration, 1)
-      // Ease out cubic
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp
+      const progress = Math.min((timestamp - startTime) / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
-      setCount(Math.floor(start + range * eased))
+      setCount(Math.floor(eased * target))
 
       if (progress < 1) {
-        requestAnimationFrame(step)
+        animationFrame = requestAnimationFrame(animate)
       }
     }
 
-    requestAnimationFrame(step)
-  }, [end, duration, start])
-
-  useEffect(() => {
-    if (enabled) animate()
-  }, [enabled, animate])
+    animationFrame = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(animationFrame)
+  }, [isVisible, target, duration])
 
   return count
 }

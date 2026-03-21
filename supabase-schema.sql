@@ -170,3 +170,215 @@ CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
 CREATE INDEX IF NOT EXISTS idx_invoices_quote_id ON invoices(quote_id);
 CREATE INDEX IF NOT EXISTS idx_projects_category ON projects(category);
 CREATE INDEX IF NOT EXISTS idx_projects_featured ON projects(featured) WHERE featured = TRUE;
+
+-- ============================================================
+-- Carnet Digital — Tables
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  phone TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  shop_name TEXT NOT NULL,
+  shop_type TEXT NOT NULL CHECK (shop_type IN ('boutique', 'restaurant', 'salon', 'atelier', 'autre')),
+  country TEXT NOT NULL DEFAULT 'SN',
+  language TEXT NOT NULL DEFAULT 'fr',
+  currency TEXT NOT NULL DEFAULT 'XOF',
+  plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free', 'pro', 'business')),
+  wave_phone TEXT,
+  logo_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS carnet_products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  buy_price DECIMAL(12,2) NOT NULL DEFAULT 0,
+  sell_price DECIMAL(12,2) NOT NULL,
+  quantity INTEGER NOT NULL DEFAULT 0,
+  low_stock_threshold INTEGER NOT NULL DEFAULT 5,
+  category TEXT,
+  image_url TEXT,
+  synced BOOLEAN NOT NULL DEFAULT TRUE,
+  local_id TEXT UNIQUE,
+  deleted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS clients (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  phone TEXT,
+  last_reminder_at TIMESTAMPTZ,
+  synced BOOLEAN NOT NULL DEFAULT TRUE,
+  local_id TEXT UNIQUE,
+  deleted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS sales (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  product_id UUID REFERENCES carnet_products(id) ON DELETE SET NULL,
+  client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  cost_price DECIMAL(12,2) NOT NULL DEFAULT 0,
+  quantity INTEGER NOT NULL DEFAULT 1,
+  payment_method TEXT NOT NULL CHECK (payment_method IN ('cash', 'wave', 'credit')),
+  note TEXT,
+  synced BOOLEAN NOT NULL DEFAULT TRUE,
+  local_id TEXT UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS debts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  sale_id UUID REFERENCES sales(id) ON DELETE SET NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  paid_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'partial', 'paid')),
+  due_date DATE,
+  synced BOOLEAN NOT NULL DEFAULT TRUE,
+  local_id TEXT UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS debt_payments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  debt_id UUID NOT NULL REFERENCES debts(id) ON DELETE CASCADE,
+  amount DECIMAL(12,2) NOT NULL,
+  method TEXT NOT NULL CHECK (method IN ('cash', 'wave')),
+  wave_checkout_id TEXT,
+  synced BOOLEAN NOT NULL DEFAULT TRUE,
+  local_id TEXT UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS reminders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  total_amount DECIMAL(12,2) NOT NULL,
+  message TEXT,
+  sent_via TEXT NOT NULL DEFAULT 'whatsapp' CHECK (sent_via IN ('whatsapp', 'sms')),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'delivered', 'failed')),
+  payment_link_id TEXT,
+  sent_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS payment_links (
+  id TEXT PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  client_id UUID REFERENCES clients(id),
+  amount DECIMAL(12,2) NOT NULL,
+  description TEXT,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'expired')),
+  wave_checkout_id TEXT,
+  commission_rate DECIMAL(4,3) NOT NULL DEFAULT 0.02,
+  commission_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  paid_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '7 days'),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================
+-- Carnet Digital — RLS
+-- ============================================================
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE carnet_products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sales ENABLE ROW LEVEL SECURITY;
+ALTER TABLE debts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE debt_payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE reminders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payment_links ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "service_role_profiles" ON profiles FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "service_role_carnet_products" ON carnet_products FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "service_role_clients" ON clients FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "service_role_sales" ON sales FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "service_role_debts" ON debts FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "service_role_debt_payments" ON debt_payments FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "service_role_reminders" ON reminders FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "service_role_payment_links" ON payment_links FOR ALL TO service_role USING (true) WITH CHECK (true);
+
+CREATE POLICY "own_profiles" ON profiles FOR ALL TO authenticated USING (id = auth.uid()) WITH CHECK (id = auth.uid());
+CREATE POLICY "own_carnet_products" ON carnet_products FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "own_clients" ON clients FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "own_sales" ON sales FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "own_debts" ON debts FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "own_debt_payments" ON debt_payments FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "own_reminders" ON reminders FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "own_payment_links" ON payment_links FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "public_payment_links_read" ON payment_links FOR SELECT TO anon USING (true);
+
+-- ============================================================
+-- Carnet Digital — Triggers
+-- ============================================================
+
+CREATE TRIGGER trg_profiles_updated BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER trg_carnet_products_updated BEFORE UPDATE ON carnet_products FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER trg_clients_updated BEFORE UPDATE ON clients FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER trg_sales_updated BEFORE UPDATE ON sales FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER trg_debts_updated BEFORE UPDATE ON debts FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER trg_debt_payments_updated BEFORE UPDATE ON debt_payments FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ============================================================
+-- Carnet Digital — Indexes
+-- ============================================================
+
+CREATE INDEX IF NOT EXISTS idx_profiles_phone ON profiles(phone);
+CREATE INDEX IF NOT EXISTS idx_sales_user_date ON sales(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_sales_unsynced ON sales(synced) WHERE synced = FALSE;
+CREATE INDEX IF NOT EXISTS idx_debts_client ON debts(client_id, status);
+CREATE INDEX IF NOT EXISTS idx_debts_user ON debts(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_debt_payments_debt ON debt_payments(debt_id);
+CREATE INDEX IF NOT EXISTS idx_carnet_products_user ON carnet_products(user_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_clients_user ON clients(user_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_payment_links_status ON payment_links(status);
+CREATE INDEX IF NOT EXISTS idx_carnet_products_unsynced ON carnet_products(synced) WHERE synced = FALSE;
+CREATE INDEX IF NOT EXISTS idx_clients_unsynced ON clients(synced) WHERE synced = FALSE;
+CREATE INDEX IF NOT EXISTS idx_debts_unsynced ON debts(synced) WHERE synced = FALSE;
+CREATE INDEX IF NOT EXISTS idx_debt_payments_unsynced ON debt_payments(synced) WHERE synced = FALSE;
+
+-- ============================================================
+-- OTP & Rate Limiting (serverless-safe)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS otp_codes (
+  pin_id TEXT PRIMARY KEY,
+  phone TEXT NOT NULL,
+  code TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  attempts INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS rate_limits (
+  key TEXT PRIMARY KEY,
+  count INTEGER NOT NULL DEFAULT 0,
+  reset_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE otp_codes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rate_limits ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "service_role_otp_codes" ON otp_codes FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "service_role_rate_limits" ON rate_limits FOR ALL TO service_role USING (true) WITH CHECK (true);
+
+CREATE INDEX IF NOT EXISTS idx_otp_codes_expires ON otp_codes(expires_at);
+CREATE INDEX IF NOT EXISTS idx_rate_limits_reset ON rate_limits(reset_at);
