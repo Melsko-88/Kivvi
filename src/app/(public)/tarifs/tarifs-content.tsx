@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Check, ArrowRight, ChevronDown } from 'lucide-react'
-import { PACKAGES, FAQ_ITEMS } from '@/lib/constants'
+import { SAAS_PLANS, FAQ_ITEMS } from '@/lib/constants'
 import { formatPrice } from '@/lib/format'
 import { ScrollReveal, StaggerContainer, StaggerItem } from '@/components/shared/scroll-reveal'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
@@ -55,32 +55,32 @@ export function TarifsPageContent() {
             Tarifs
           </span>
           <h1 className="mb-6 font-[family-name:var(--font-heading)] text-3xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Des forfaits
+            Des outils digitaux
             <br />
             <span className="bg-gradient-to-r from-foreground via-foreground/80 to-foreground/50 bg-clip-text text-transparent">
-              pour chaque ambition
+              pour chaque entrepreneur
             </span>
           </h1>
           <p className="mx-auto max-w-2xl text-foreground/40">
-            Transparence totale. Choisissez le forfait adapté à vos besoins.
+            Digitalise ton business avec des outils simples, puissants et pensés pour l&apos;Afrique. Commence gratuitement.
           </p>
         </ScrollReveal>
 
-        {/* Pricing Cards */}
+        {/* SaaS Plans */}
         <StaggerContainer
           className="mb-12 sm:mb-24 grid gap-4 sm:gap-6 lg:grid-cols-3"
           staggerDelay={0.15}
         >
-          {PACKAGES.map((pkg) => (
-            <StaggerItem key={pkg.name}>
+          {SAAS_PLANS.map((plan) => (
+            <StaggerItem key={plan.name}>
               <div
                 className={`relative flex h-full flex-col overflow-hidden rounded-2xl sm:rounded-3xl border p-4 transition-all duration-500 sm:p-8 lg:p-10 ${
-                  pkg.highlighted
+                  plan.highlighted
                     ? 'border-foreground/[0.12] bg-foreground/[0.04]'
                     : 'border-foreground/[0.04] bg-foreground/[0.015] hover:border-foreground/[0.08] hover:bg-foreground/[0.03]'
                 }`}
               >
-                {pkg.highlighted && (
+                {plan.highlighted && (
                   <div className="absolute right-4 top-4 rounded-full border border-foreground/[0.12] bg-foreground/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground/60">
                     Populaire
                   </div>
@@ -88,29 +88,29 @@ export function TarifsPageContent() {
 
                 <div className="mb-4 sm:mb-6">
                   <span className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.2em] text-foreground/30">
-                    {pkg.subtitle}
+                    {plan.subtitle}
                   </span>
                   <h2 className="mt-1 font-[family-name:var(--font-heading)] text-xl sm:text-2xl font-bold">
-                    {pkg.name}
+                    {plan.name}
                   </h2>
                 </div>
 
                 <div className="mb-5 sm:mb-8">
                   <span className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl font-bold">
-                    {formatPrice(pkg.price)}
+                    {plan.price === 0 ? 'Gratuit' : formatPrice(plan.price)}
                   </span>
-                  {pkg.priceNote && (
+                  {plan.period && plan.price !== 0 && (
+                    <span className="text-sm text-foreground/30">{plan.period}</span>
+                  )}
+                  {plan.priceNote && (
                     <span className="mt-1 block text-[10px] sm:text-xs text-foreground/30">
-                      {pkg.priceNote}
+                      {plan.priceNote}
                     </span>
                   )}
-                  <span className="mt-1 sm:mt-2 block text-[10px] sm:text-xs text-foreground/30">
-                    Livraison : {pkg.delivery}
-                  </span>
                 </div>
 
                 <ul className="mb-5 sm:mb-8 flex-1 space-y-2 sm:space-y-3">
-                  {pkg.features.map((feature) => (
+                  {plan.features.map((feature) => (
                     <li
                       key={feature}
                       className="flex items-start gap-2 sm:gap-2.5 text-xs sm:text-sm text-foreground/50"
@@ -124,14 +124,14 @@ export function TarifsPageContent() {
                   ))}
                 </ul>
 
-                <Link href="/devis" className="mt-auto">
-                  {pkg.highlighted ? (
+                <Link href={plan.ctaHref} className="mt-auto">
+                  {plan.highlighted ? (
                     <LiquidButton size="lg" className="w-full">
-                      Choisir ce forfait
+                      {plan.cta}
                     </LiquidButton>
                   ) : (
                     <button className="w-full rounded-full border border-foreground/10 bg-foreground/[0.03] py-3 text-sm font-medium transition-all hover:border-foreground/20 hover:bg-foreground/[0.06]">
-                      Choisir ce forfait
+                      {plan.cta}
                     </button>
                   )}
                 </Link>
@@ -159,12 +159,15 @@ export function TarifsPageContent() {
         {/* CTA */}
         <ScrollReveal className="mt-12 sm:mt-20 text-center" delay={0.2}>
           <p className="mb-6 text-foreground/40">
-            Besoin d&apos;une solution personnalisée ?
+            Besoin d&apos;un projet sur mesure ? Consultez nos{' '}
+            <Link href="/services" className="underline underline-offset-2 hover:text-foreground/70 transition-colors">
+              services agence
+            </Link>
           </p>
-          <Link href="/devis">
+          <Link href="/contact">
             <LiquidButton size="xl">
               <span className="flex items-center gap-2">
-                Demander un devis sur mesure
+                Contactez-nous
                 <ArrowRight size={16} />
               </span>
             </LiquidButton>

@@ -48,6 +48,19 @@ export type Package = {
   highlighted?: boolean
 }
 
+export type SaaSPlan = {
+  name: string
+  subtitle: string
+  price: number | string
+  period?: string
+  priceNote?: string
+  features: string[]
+  limits?: string[]
+  highlighted?: boolean
+  cta: string
+  ctaHref: string
+}
+
 export type PortfolioProject = {
   name: string
   description: string
@@ -167,6 +180,64 @@ export const SERVICES: Service[] = [
 ]
 
 // ─── Packages ────────────────────────────────────────────────────────
+
+// ─── SaaS Plans (Outils Kivvi) ──────────────────────────────────────
+
+export const SAAS_PLANS: SaaSPlan[] = [
+  {
+    name: 'Gratuit',
+    subtitle: 'Pour démarrer',
+    price: 0,
+    features: [
+      'Carnet Digital (ventes & dettes)',
+      'Jusqu\'à 50 produits',
+      '3 rappels WhatsApp / jour',
+      'Tableau de bord basique',
+      'Mode hors-ligne (PWA)',
+      'Paiement Wave intégré',
+    ],
+    cta: 'Commencer gratuitement',
+    ctaHref: '/auth',
+  },
+  {
+    name: 'Pro',
+    subtitle: 'Pour grandir',
+    price: 4900,
+    period: '/mois',
+    features: [
+      'Tout du plan Gratuit',
+      'Produits illimités',
+      'Rappels WhatsApp illimités',
+      'Factures PDF professionnelles',
+      'Tableau de bord avancé (graphiques, tendances)',
+      'Export des données (CSV)',
+      'Support prioritaire WhatsApp',
+    ],
+    highlighted: true,
+    cta: 'Passer au Pro',
+    ctaHref: '/auth',
+  },
+  {
+    name: 'Business',
+    subtitle: 'Pour dominer',
+    price: 14900,
+    period: '/mois',
+    features: [
+      'Tout du plan Pro',
+      'Mini site boutique en ligne',
+      'Gestion multi-boutiques',
+      'Analyse IA de vos ventes',
+      'Comptabilité simplifiée',
+      'Gestion des employés',
+      'Accompagnement personnalisé',
+    ],
+    priceNote: 'Idéal pour 2+ points de vente',
+    cta: 'Choisir Business',
+    ctaHref: '/auth',
+  },
+]
+
+// ─── Packages Agence (Services sur mesure) ──────────────────────────
 
 export const PACKAGES: Package[] = [
   {
@@ -345,28 +416,28 @@ export const TESTIMONIALS = [
 
 export const FAQ_ITEMS = [
   {
-    question: 'Quels sont vos délais de livraison ?',
-    answer: 'Les délais varient selon le projet : 2-3 semaines pour un site vitrine, 4-6 semaines pour un site institutionnel ou e-commerce, et 8-16 semaines pour les plateformes sur mesure. Nous établissons un calendrier précis dès la validation du devis.',
+    question: 'Le Carnet Digital est vraiment gratuit ?',
+    answer: 'Oui, le plan Gratuit est 100% gratuit, sans limite de temps. Il inclut le Carnet Digital avec gestion des ventes, dettes, rappels WhatsApp et paiement Wave. Vous pouvez passer au plan Pro ou Business à tout moment pour débloquer plus de fonctionnalités.',
   },
   {
-    question: 'Proposez-vous un accompagnement après la livraison ?',
-    answer: 'Oui, tous nos projets incluent une période de maintenance gratuite (1 à 3 mois selon le forfait). Ensuite, nous proposons des contrats de maintenance mensuels à partir de 35 000 CFA/mois.',
+    question: 'Comment fonctionne le mode hors-ligne ?',
+    answer: 'Le Carnet Digital est une PWA (Progressive Web App) qui fonctionne même sans connexion internet. Vos données sont sauvegardées localement sur votre téléphone et synchronisées automatiquement dès que vous retrouvez la connexion.',
+  },
+  {
+    question: 'Puis-je changer de plan à tout moment ?',
+    answer: 'Oui, vous pouvez upgrader ou downgrader votre plan à tout moment. Si vous passez au plan Pro, vous êtes facturé mensuellement via Wave. Aucun engagement, vous pouvez annuler quand vous voulez.',
+  },
+  {
+    question: 'C\'est quoi la différence entre les outils et les services sur mesure ?',
+    answer: 'Les outils Kivvi (Carnet Digital, facturation, etc.) sont des applications prêtes à l\'emploi que vous utilisez directement. Les services sur mesure sont des projets personnalisés (site web, application mobile) développés spécifiquement pour votre entreprise.',
   },
   {
     question: 'Quels modes de paiement acceptez-vous ?',
-    answer: 'Nous acceptons les virements bancaires, Wave, Orange Money et le paiement en espèces. Le paiement se fait généralement en 3 étapes : 40% à la commande, 30% à la maquette validée, 30% à la livraison.',
+    answer: 'Pour les abonnements outils : Wave. Pour les projets sur mesure : virements bancaires, Wave, Orange Money et espèces. Le paiement projets se fait en 3 étapes : 40% à la commande, 30% à la maquette, 30% à la livraison.',
   },
   {
     question: 'Travaillez-vous avec des clients hors du Sénégal ?',
-    answer: 'Absolument ! Nous travaillons avec des clients dans toute l\'Afrique de l\'Ouest et au-delà. Nos équipes sont basées à Kaolack (Sénégal) et Abidjan (Côte d\'Ivoire), et nous collaborons à distance avec des outils professionnels.',
-  },
-  {
-    question: 'Comment se déroule un projet avec KIVVI ?',
-    answer: '1) Échange initial et devis gratuit, 2) Validation du cahier des charges, 3) Création des maquettes, 4) Développement et tests, 5) Livraison et formation, 6) Maintenance et support continu.',
-  },
-  {
-    question: 'Est-ce que le nom de domaine et l\'hébergement sont inclus ?',
-    answer: 'Oui, nos forfaits Starter et Pro incluent le nom de domaine et l\'hébergement pour la première année. Le renouvellement annuel est à partir de 50 000 CFA.',
+    answer: 'Absolument ! Nos outils fonctionnent partout en Afrique de l\'Ouest (Sénégal, Côte d\'Ivoire, Mali, etc.). Pour les services sur mesure, nos équipes à Kaolack et Abidjan collaborent à distance avec des clients partout dans le monde.',
   },
 ] as const
 
