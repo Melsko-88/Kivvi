@@ -1,10 +1,10 @@
-import { createClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
-import { Store, CreditCard, Clock, CheckCircle, AlertTriangle, Zap } from 'lucide-react'
+import { Store, Clock, CheckCircle, AlertTriangle, ShieldCheck } from 'lucide-react'
 import { createWaveCheckout } from '@/lib/services/wave'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { formatCurrency } from '@/lib/carnet-constants'
+import { createClient } from '@supabase/supabase-js'
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 const MAX_REQUESTS = 10
@@ -72,7 +72,7 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
     return (
       <PageShell>
         <StatusCard
-          icon={<AlertTriangle className="size-8 text-amber-500" />}
+          icon={<AlertTriangle className="size-8 text-amber-400" />}
           title="Trop de requêtes"
           message="Veuillez patienter quelques instants avant de réessayer."
         />
@@ -86,7 +86,7 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
     return (
       <PageShell>
         <StatusCard
-          icon={<AlertTriangle className="size-8 text-red-500" />}
+          icon={<AlertTriangle className="size-8 text-red-400" />}
           title="Lien introuvable"
           message="Ce lien de paiement n'existe pas ou a été supprimé."
         />
@@ -98,9 +98,14 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
     return (
       <PageShell>
         <StatusCard
-          icon={<CheckCircle className="size-8 text-emerald-500" />}
-          title="Déjà payé"
-          message="Ce paiement a déjà été effectué. Merci !"
+          icon={
+            <div className="animate-scale-in">
+              <CheckCircle className="size-10 text-emerald-400" />
+            </div>
+          }
+          title="Paiement confirmé"
+          message="Ce paiement a été effectué avec succès. Merci !"
+          variant="success"
         />
       </PageShell>
     )
@@ -110,9 +115,9 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
     return (
       <PageShell>
         <StatusCard
-          icon={<Clock className="size-8 text-amber-500" />}
-          title="Lien expiré"
-          message="Ce lien de paiement a expiré. Contactez le commerçant pour en obtenir un nouveau."
+          icon={<Clock className="size-8 text-amber-400" />}
+          title="Ce lien a expiré"
+          message="Contactez le commerçant pour obtenir un nouveau lien de paiement."
         />
       </PageShell>
     )
@@ -145,52 +150,99 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
 
   return (
     <PageShell>
-      <div className="w-full max-w-md mx-auto">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-6 py-8 text-center">
-            <div className="inline-flex items-center justify-center size-14 rounded-2xl bg-white/10 mb-4">
-              <Store className="size-7 text-white" />
+      <div className="w-full max-w-md mx-auto animate-slide-up">
+        {/* Main glass card */}
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{
+            background: 'rgba(255, 255, 255, 0.04)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          {/* Header */}
+          <div className="px-6 pt-8 pb-6 text-center">
+            <div
+              className="inline-flex items-center justify-center size-14 rounded-2xl mb-4"
+              style={{
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
+            >
+              <Store className="size-7 text-white/80" />
             </div>
-            <h2 className="text-white font-semibold text-lg">{shopName}</h2>
+            <h2 className="text-white font-semibold text-lg tracking-tight">{shopName}</h2>
             {clientName && (
-              <p className="text-white/60 text-sm mt-1">Pour {clientName}</p>
+              <p className="text-white/40 text-sm mt-1">Pour {clientName}</p>
             )}
           </div>
 
+          {/* Separator */}
+          <div
+            className="mx-6"
+            style={{
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 30%, rgba(255,255,255,0.08) 70%, transparent 100%)',
+            }}
+          />
+
+          {/* Content */}
           <div className="px-6 py-8 space-y-6">
+            {/* Amount */}
             <div className="text-center">
-              <p className="text-sm text-gray-500 mb-1">Montant à payer</p>
-              <p className="text-4xl font-bold text-gray-900 tracking-tight">
+              <p className="text-sm text-white/40 mb-2">Montant à payer</p>
+              <p className="text-4xl font-bold text-white tracking-tight">
                 {formatCurrency(link.amount, currency)}
               </p>
             </div>
 
+            {/* Description */}
             {link.description && (
-              <div className="bg-gray-50 rounded-xl px-4 py-3">
-                <p className="text-sm text-gray-500 mb-0.5">Description</p>
-                <p className="text-sm text-gray-700">{link.description}</p>
+              <div
+                className="rounded-xl px-4 py-3"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                }}
+              >
+                <p className="text-xs text-white/30 mb-0.5">Description</p>
+                <p className="text-sm text-white/70">{link.description}</p>
               </div>
             )}
 
+            {/* Wave Pay Button */}
             <form action={handlePay}>
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2.5 bg-[#1DC1EC] hover:bg-[#18a8cf] text-white font-semibold py-4 rounded-xl transition-colors active:scale-[0.98]"
+                className="w-full flex items-center justify-center gap-2.5 bg-[#1DC3F1] hover:bg-[#18a8cf] text-white font-semibold py-4 rounded-xl transition-all duration-200 active:scale-[0.98] cursor-pointer"
+                style={{
+                  boxShadow: '0 0 30px rgba(29, 195, 241, 0.15)',
+                }}
               >
-                <Zap className="size-5" />
-                Payer via Wave
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://res.cloudinary.com/dzi8whann/image/upload/v1772014289/tiak-tiak/icons/transport/dgbwn7kcgwakswxmwyls.png"
+                  alt="Wave"
+                  width={24}
+                  height={24}
+                  className="size-6"
+                />
+                Payer avec Wave
               </button>
             </form>
 
-            <div className="flex items-center gap-2 justify-center text-xs text-gray-400">
-              <CreditCard className="size-3.5" />
+            {/* Security note */}
+            <div className="flex items-center gap-1.5 justify-center text-xs text-white/25">
+              <ShieldCheck className="size-3.5" />
               <span>Paiement sécurisé via Wave</span>
             </div>
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
-          Propulsé par <span className="font-semibold text-gray-500">Kivvi</span>
+        {/* Footer */}
+        <p className="text-center text-xs text-white/20 mt-6">
+          Propulsé par <span className="font-semibold text-white/35">Kivvi</span>
         </p>
       </div>
     </PageShell>
@@ -199,22 +251,63 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
 
 function PageShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-dvh bg-gray-50 flex items-center justify-center px-4 py-8">
-      {children}
+    <div
+      className="min-h-dvh flex items-center justify-center px-4 py-8 relative"
+      style={{
+        background: 'linear-gradient(180deg, #030712 0%, #111827 50%, #030712 100%)',
+      }}
+    >
+      {/* Grain overlay */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E")`,
+          backgroundRepeat: 'repeat',
+          opacity: 0.4,
+        }}
+      />
+      {/* Subtle radial glow behind card */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{
+          background: 'radial-gradient(ellipse 50% 40% at 50% 45%, rgba(255,255,255,0.02) 0%, transparent 100%)',
+        }}
+      />
+      <div className="relative z-10 w-full">
+        {children}
+      </div>
     </div>
   )
 }
 
-function StatusCard({ icon, title, message }: { icon: React.ReactNode; title: string; message: string }) {
+function StatusCard({
+  icon,
+  title,
+  message,
+  variant,
+}: {
+  icon: React.ReactNode
+  title: string
+  message: string
+  variant?: 'success' | 'error' | 'warning'
+}) {
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 px-6 py-10 text-center space-y-3">
+    <div className="w-full max-w-md mx-auto animate-slide-up">
+      <div
+        className="rounded-2xl px-6 py-10 text-center space-y-3"
+        style={{
+          background: 'rgba(255, 255, 255, 0.04)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+        }}
+      >
         <div className="flex justify-center">{icon}</div>
-        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-        <p className="text-sm text-gray-500">{message}</p>
+        <h2 className="text-lg font-semibold text-white">{title}</h2>
+        <p className="text-sm text-white/50">{message}</p>
       </div>
-      <p className="text-center text-xs text-gray-400 mt-6">
-        Propulsé par <span className="font-semibold text-gray-500">Kivvi</span>
+      <p className="text-center text-xs text-white/20 mt-6">
+        Propulsé par <span className="font-semibold text-white/35">Kivvi</span>
       </p>
     </div>
   )
