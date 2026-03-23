@@ -60,13 +60,21 @@ export async function POST(req: NextRequest) {
       needsOnboarding: !existingProfile,
     })
 
+    // Clear any stale Supabase auth cookies before setting new ones
+    req.cookies.getAll().forEach((cookie) => {
+      if (cookie.name.startsWith('sb-')) {
+        response.cookies.delete(cookie.name)
+      }
+    })
+
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
           getAll() {
-            return req.cookies.getAll()
+            // Return empty to avoid stale session interference
+            return []
           },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value, options }) =>

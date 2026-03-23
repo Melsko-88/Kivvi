@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2, ArrowLeft, ArrowRight, BookOpen } from 'lucide-react'
 import { PhoneInput } from '@/components/carnet/phone-input'
@@ -10,7 +9,6 @@ import { OtpInput } from '@/components/carnet/otp-input'
 const ease = [0.25, 0.1, 0.25, 1] as const
 
 export default function AuthPage() {
-  const router = useRouter()
   const [step, setStep] = useState<'phone' | 'otp'>('phone')
   const [phone, setPhone] = useState('')
   const [pinId, setPinId] = useState('')
@@ -72,7 +70,8 @@ export default function AuthPage() {
         return
       }
 
-      router.push(data.needsOnboarding ? '/auth/onboarding' : '/app/sales')
+      // Hard redirect to ensure cookies are fully applied before navigation
+      window.location.href = data.needsOnboarding ? '/auth/onboarding' : '/app/sales'
     } catch {
       setError('Erreur de connexion')
       setLoading(false)

@@ -4,10 +4,6 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  if (!pathname.startsWith('/app')) {
-    return NextResponse.next()
-  }
-
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -33,7 +29,15 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  // Authenticated user visiting /auth → redirect to app
+  if (user && pathname === '/auth') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/app/sales'
+    return NextResponse.redirect(url)
+  }
+
+  // Unauthenticated user visiting /app/* → redirect to auth
+  if (!user && pathname.startsWith('/app')) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth'
     return NextResponse.redirect(url)
@@ -43,5 +47,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/app/:path*'],
+  matcher: ['/app/:path*', '/auth'],
 }

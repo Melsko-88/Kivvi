@@ -1,20 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { LogOut, Trash2, User, Store, Phone, Globe, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { createClient } from '@/lib/supabase/client'
 
 export default function SettingsPage() {
-  const router = useRouter()
   const { profile, signOut } = useAuth()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
   async function handleSignOut() {
     await signOut()
-    router.push('/auth')
+    window.location.href = '/auth'
   }
 
   async function handleDeleteAccount() {
@@ -26,7 +24,7 @@ export default function SettingsPage() {
         await supabase.from('profiles').delete().eq('id', user.id)
       }
       await signOut()
-      router.push('/auth')
+      window.location.href = '/auth'
     } finally {
       setDeleting(false)
     }
