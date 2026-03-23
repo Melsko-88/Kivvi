@@ -10,6 +10,8 @@ export interface Profile {
   plan: Plan
   wave_phone?: string
   logo_url?: string
+  subscription_expires_at?: string
+  subscription_id?: string
   created_at: string
   updated_at: string
 }
@@ -129,3 +131,70 @@ export interface DashboardData {
 }
 
 export type Period = 'today' | 'week' | 'month'
+
+export type SubscriptionStatus = 'pending' | 'active' | 'expired' | 'cancelled'
+export type PackType = 'products' | 'reminders' | 'commission_reduction'
+export type PackStatus = 'pending' | 'active' | 'expired' | 'used'
+export type ReminderType = 'manual' | 'auto'
+export type ReminderChannel = 'whatsapp' | 'sms'
+
+export interface Subscription {
+  id: string
+  user_id: string
+  plan: 'pro' | 'business'
+  status: SubscriptionStatus
+  amount: number
+  wave_checkout_id?: string
+  started_at?: string
+  expires_at?: string
+  reminder_sent_at?: string
+  created_at: string
+}
+
+export interface UsagePack {
+  id: string
+  user_id: string
+  pack_type: PackType
+  quantity: number
+  remaining: number
+  amount: number
+  status: PackStatus
+  activated_at?: string
+  expires_at?: string
+  created_at: string
+}
+
+export interface WhatsAppReminder {
+  id: string
+  user_id: string
+  client_id: string
+  debt_id?: string
+  type: ReminderType
+  channel: ReminderChannel
+  status: 'sent' | 'failed'
+  payment_link_id?: string
+  error_message?: string
+  created_at: string
+}
+
+export interface AutoReminderSettings {
+  user_id: string
+  enabled: boolean
+  frequency_days: number
+  min_debt_age_days: number
+  min_amount: number
+}
+
+export interface PlanStatus {
+  plan: Plan
+  expiresAt: string | null
+  daysRemaining: number | null
+  effectiveProductLimit: number
+  effectiveReminderLimit: number
+  hasCommissionReduction: boolean
+  effectiveCommissionRate: number
+  remindersUsedToday: number
+  productCount: number
+  activePacks: UsagePack[]
+  activeSubscription: Subscription | null
+}

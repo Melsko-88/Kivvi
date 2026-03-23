@@ -73,3 +73,20 @@ export const PLAN_LIMITS = {
   pro: { products: Infinity, reminders_per_day: Infinity, commission: 0.01 },
   business: { products: Infinity, reminders_per_day: Infinity, commission: 0.005 },
 } as const
+
+export const SUBSCRIPTION_PRICES: Record<string, number> = {
+  pro: 4900,
+  business: 14900,
+}
+
+export const PACK_PRICES = {
+  products: 500,
+  reminders: 300,
+  commission_reduction: 1500,
+} as const
+
+export const PACK_DETAILS = {
+  products: { quantity: 50, label: '+50 produits', expires: false },
+  reminders: { quantity: 20, label: '+20 rappels WhatsApp', expires: false },
+  commission_reduction: { quantity: 1, label: 'Commission 1% (30j)', expires: true, days: 30 },
+} as const

@@ -382,3 +382,79 @@ CREATE POLICY "service_role_rate_limits" ON rate_limits FOR ALL TO service_role 
 
 CREATE INDEX IF NOT EXISTS idx_otp_codes_expires ON otp_codes(expires_at);
 CREATE INDEX IF NOT EXISTS idx_rate_limits_reset ON rate_limits(reset_at);
+
+-- ============================================================
+-- Subscriptions, Usage Packs, WhatsApp Reminders
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  plan TEXT NOT NULL CHECK (plan IN ('pro', 'business')),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'expired', 'cancelled')),
+  amount DECIMAL(10,2) NOT NULL,
+  wave_checkout_id TEXT,
+  started_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ,
+  reminder_sent_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_user ON subscriptions(user_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON subscriptions(status, expires_at);
+
+ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users see own subscriptions" ON subscriptions FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Server inserts subscriptions" ON subscriptions FOR INSERT WITH CHECK (true);
+
+CREATE TABLE IF NOT EXISTS usage_packs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  pack_type TEXT NOT NULL CHECK (pack_type IN ('products', 'reminders', 'commission_reduction')),
+  quantity INTEGER NOT NULL,
+  remaining INTEGER NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  wave_checkout_id TEXT,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'expired', 'used')),
+  activated_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_usage_packs_user ON usage_packs(user_id, pack_type, status);
+
+ALTER TABLE usage_packs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users see own packs" ON usage_packs FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Server inserts packs" ON usage_packs FOR INSERT WITH CHECK (true);
+
+CREATE TABLE IF NOT EXISTS whatsapp_reminders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL,
+  debt_id UUID,
+  type TEXT NOT NULL CHECK (type IN ('manual', 'auto')),
+  channel TEXT NOT NULL DEFAULT 'whatsapp' CHECK (channel IN ('whatsapp', 'sms')),
+  status TEXT NOT NULL DEFAULT 'sent' CHECK (status IN ('sent', 'failed')),
+  payment_link_id TEXT,
+  error_message TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_reminders_user_date ON whatsapp_reminders(user_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_reminders_client ON whatsapp_reminders(client_id, created_at);
+
+ALTER TABLE whatsapp_reminders ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users see own reminders" ON whatsapp_reminders FOR SELECT USING (user_id = auth.uid());
+
+CREATE TABLE IF NOT EXISTS auto_reminder_settings (
+  user_id UUID PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
+  enabled BOOLEAN NOT NULL DEFAULT false,
+  frequency_days INTEGER NOT NULL DEFAULT 3 CHECK (frequency_days BETWEEN 1 AND 30),
+  min_debt_age_days INTEGER NOT NULL DEFAULT 7 CHECK (min_debt_age_days >= 1),
+  min_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE auto_reminder_settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own settings" ON auto_reminder_settings FOR ALL USING (user_id = auth.uid());
+
+ALTER TABLE profiles
+  ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS subscription_id UUID;
