@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { getUserPlanStatus, canAddProduct } from '@/lib/services/plan-service'
 
 const TABLE_MAP: Record<string, string> = {
   sales: 'sales',
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const syncedIds: Record<string, string[]> = {}
+    const planStatus = await getUserPlanStatus(user.id)
 
     for (const [localTable, records] of Object.entries(body)) {
       const dbTable = TABLE_MAP[localTable]
@@ -49,6 +51,15 @@ export async function POST(req: NextRequest) {
 
       for (const record of records) {
         const { local_id, server_id, synced: _synced, ...data } = record as Record<string, unknown>
+
+        // Skip new products if limit reached
+        if (dbTable === 'carnet_products') {
+          const isNewProduct = !server_id && !(data as Record<string, unknown>).deleted_at
+          if (isNewProduct && !canAddProduct(planStatus)) {
+            continue
+          }
+          if (isNewProduct) planStatus.productCount++
+        }
 
         const row = {
           ...data,

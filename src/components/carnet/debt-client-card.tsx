@@ -17,20 +17,53 @@ interface DebtClientCardProps {
   expanded: boolean
   onToggle: () => void
   onPay: () => void
+  userId: string
+  onQuotaExceeded: () => void
 }
 
-export function DebtClientCard({ client, expanded, onToggle, onPay }: DebtClientCardProps) {
+export function DebtClientCard({ client, expanded, onToggle, onPay, userId, onQuotaExceeded }: DebtClientCardProps) {
   const clientId = client.local_id ?? client.id
   const debts = useClientDebts(clientId)
-  const [toastVisible, setToastVisible] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [sendResult, setSendResult] = useState<{ type: 'success' | 'error' | 'no_phone'; message: string } | null>(null)
+  const [cooldown, setCooldown] = useState(false)
 
   const oldestDate = debts?.length
     ? debts.reduce((oldest, d) => (d.created_at < oldest ? d.created_at : oldest), debts[0].created_at)
     : null
 
-  function handleWhatsApp() {
-    setToastVisible(true)
-    setTimeout(() => setToastVisible(false), 2500)
+  async function handleSendReminder() {
+    if (cooldown) return
+    setSending(true)
+    setSendResult(null)
+    try {
+      const res = await fetch('/api/reminders/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: client.local_id ?? client.id }),
+      })
+
+      if (res.status === 429) {
+        onQuotaExceeded()
+        return
+      }
+
+      const data = await res.json()
+      if (data.success) {
+        setSendResult({ type: 'success', message: `Rappel envoyé par ${data.channel === 'whatsapp' ? 'WhatsApp' : 'SMS'}` })
+        setCooldown(true)
+        setTimeout(() => setCooldown(false), 30000)
+      } else if (data.error === 'Le client n\'a pas de numéro de téléphone') {
+        setSendResult({ type: 'no_phone', message: 'Ajoutez un numéro au client' })
+      } else {
+        setSendResult({ type: 'error', message: 'Échec de l\'envoi' })
+      }
+    } catch {
+      setSendResult({ type: 'error', message: 'Erreur réseau' })
+    } finally {
+      setSending(false)
+      setTimeout(() => setSendResult(null), 3000)
+    }
   }
 
   return (
@@ -94,17 +127,30 @@ export function DebtClientCard({ client, expanded, onToggle, onPay }: DebtClient
               Payer
             </button>
             <button
-              onClick={handleWhatsApp}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"
+              onClick={handleSendReminder}
+              disabled={sending || cooldown}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
             >
-              <MessageCircle className="size-4" />
-              Rappel WhatsApp
+              {sending ? (
+                <div className="size-4 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
+              ) : (
+                <MessageCircle className="size-4" />
+              )}
+              {cooldown ? 'Envoyé' : 'Rappel WhatsApp'}
             </button>
           </div>
 
-          {toastVisible && (
-            <div className="mx-4 mb-3 px-3 py-2 rounded-lg bg-foreground/5 border border-border text-center">
-              <p className="text-xs text-muted-foreground">Bientôt disponible</p>
+          {sendResult && (
+            <div className={`mx-4 mb-3 px-3 py-2 rounded-lg text-center ${
+              sendResult.type === 'success' ? 'bg-green-50 border border-green-200' :
+              sendResult.type === 'no_phone' ? 'bg-orange-50 border border-orange-200' :
+              'bg-red-50 border border-red-200'
+            }`}>
+              <p className={`text-xs ${
+                sendResult.type === 'success' ? 'text-green-700' :
+                sendResult.type === 'no_phone' ? 'text-orange-700' :
+                'text-red-700'
+              }`}>{sendResult.message}</p>
             </div>
           )}
         </div>

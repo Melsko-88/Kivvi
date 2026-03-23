@@ -327,6 +327,55 @@ export function useDashboardData(userId: string, period: Period): DashboardData 
       }))
       .sort((a, b) => a.date.localeCompare(b.date))
 
+    // Payment distribution
+    const paymentMap: Record<string, { amount: number; count: number }> = {}
+    for (const sale of sales) {
+      const method = sale.payment_method || 'cash'
+      const existing = paymentMap[method] || { amount: 0, count: 0 }
+      existing.amount += sale.amount
+      existing.count++
+      paymentMap[method] = existing
+    }
+    const payment_distribution = Object.entries(paymentMap)
+      .map(([method, data]) => ({ method, ...data }))
+      .sort((a, b) => b.amount - a.amount)
+
+    // Top clients
+    const clientSalesMap: Record<string, { amount: number; count: number }> = {}
+    for (const sale of sales) {
+      if (sale.client_id) {
+        const existing = clientSalesMap[sale.client_id] || { amount: 0, count: 0 }
+        existing.amount += sale.amount
+        existing.count++
+        clientSalesMap[sale.client_id] = existing
+      }
+    }
+    const allClients = await db.clients.where('user_id').equals(userId).toArray()
+    const clientMap = new Map(allClients.map(c => [c.local_id, c.name]))
+    const top_clients = Object.entries(clientSalesMap)
+      .map(([id, data]) => ({ name: clientMap.get(id) || 'Inconnu', ...data }))
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 5)
+
+    // Previous period
+    const periodDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+    const prevEnd = new Date(start.getTime() - 1)
+    const prevStart = new Date(prevEnd.getTime() - periodDays * 24 * 60 * 60 * 1000)
+    const prevSales = await db.sales
+      .where('user_id')
+      .equals(userId)
+      .filter(s => {
+        const d = new Date(s.created_at)
+        return d >= prevStart && d <= prevEnd
+      })
+      .toArray()
+
+    const prevTotalSales = prevSales.reduce((s, v) => s + v.amount, 0)
+    const prevTotalCost = prevSales.reduce((s, v) => s + v.cost_price * v.quantity, 0)
+    const previous_period = prevSales.length > 0
+      ? { total_sales: prevTotalSales, profit: prevTotalSales - prevTotalCost }
+      : null
+
     return {
       total_sales,
       total_cost,
@@ -336,6 +385,9 @@ export function useDashboardData(userId: string, period: Period): DashboardData 
       debtor_count: uniqueDebtors.size,
       top_products,
       daily_sales,
+      payment_distribution,
+      top_clients,
+      previous_period,
     }
   }, [userId, period])
 }

@@ -1,18 +1,24 @@
 'use client'
 
 import { useState } from 'react'
-import { TrendingUp, ArrowDownCircle, Wallet, AlertCircle } from 'lucide-react'
+import { TrendingUp, ArrowDownCircle, Wallet, AlertCircle, Crown, Download } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
+import { usePlan } from '@/hooks/use-plan'
 import { useDashboardData } from '@/lib/db/hooks'
 import { formatCurrency } from '@/lib/carnet-constants'
 import type { Period } from '@/lib/carnet-types'
 import { PeriodFilter } from '@/components/carnet/period-filter'
 import { StatCard } from '@/components/carnet/stat-card'
 import { ProfitChart } from '@/components/carnet/profit-chart'
+import { TrendChart } from '@/components/carnet/trend-chart'
+import { DonutChart } from '@/components/carnet/donut-chart'
+import { UpsellModal } from '@/components/carnet/upsell-modal'
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const { isPro } = usePlan(user?.id)
   const [period, setPeriod] = useState<Period>('today')
+  const [showUpsell, setShowUpsell] = useState(false)
   const data = useDashboardData(user?.id || '', period)
 
   if (!data) {
@@ -25,6 +31,13 @@ export default function DashboardPage() {
       </div>
     )
   }
+
+  const salesChange = data.previous_period
+    ? ((data.total_sales - data.previous_period.total_sales) / (data.previous_period.total_sales || 1)) * 100
+    : null
+  const profitChange = data.previous_period
+    ? ((data.profit - data.previous_period.profit) / (data.previous_period.profit || 1)) * 100
+    : null
 
   return (
     <div className="space-y-5">
@@ -50,6 +63,19 @@ export default function DashboardPage() {
           color="#111111"
         />
       </div>
+
+      {isPro && salesChange !== null && (
+        <div className="flex gap-2 -mt-1 px-1">
+          <span className={`text-[10px] font-medium ${salesChange >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+            {salesChange >= 0 ? '+' : ''}{salesChange.toFixed(0)}% ventes vs période préc.
+          </span>
+          {profitChange !== null && (
+            <span className={`text-[10px] font-medium ${profitChange >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+              {profitChange >= 0 ? '+' : ''}{profitChange.toFixed(0)}% profit
+            </span>
+          )}
+        </div>
+      )}
 
       <section>
         <h3 className="text-sm font-semibold mb-2">Profit journalier</h3>
@@ -84,6 +110,103 @@ export default function DashboardPage() {
         )}
       </section>
 
+      {/* Tendances (Pro section) */}
+      <section className="relative">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-semibold">Tendances</h3>
+          {!isPro && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-foreground text-background">PRO</span>
+          )}
+        </div>
+        <div className={!isPro ? 'blur-sm pointer-events-none' : ''}>
+          <TrendChart data={data.daily_sales} />
+        </div>
+        {!isPro && (
+          <button
+            onClick={() => setShowUpsell(true)}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <span className="px-4 py-2 rounded-xl bg-foreground text-background text-sm font-medium flex items-center gap-2">
+              <Crown className="size-4" />
+              Débloquer
+            </span>
+          </button>
+        )}
+      </section>
+
+      {/* Top clients (Pro section) */}
+      <section className="relative">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-semibold">Top clients</h3>
+          {!isPro && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-foreground text-background">PRO</span>
+          )}
+        </div>
+        <div className={!isPro ? 'blur-sm pointer-events-none' : ''}>
+          {data.top_clients && data.top_clients.length > 0 ? (
+            <div className="glass rounded-xl divide-y divide-border">
+              {data.top_clients.map((client, i) => (
+                <div key={client.name} className="flex items-center gap-3 px-4 py-3">
+                  <span className="size-7 rounded-full bg-muted flex items-center justify-center text-xs font-bold">
+                    {i + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{client.name}</p>
+                    <p className="text-xs text-muted-foreground">{client.count} achat{client.count > 1 ? 's' : ''}</p>
+                  </div>
+                  <span className="text-sm font-semibold whitespace-nowrap">{formatCurrency(client.amount)}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="glass rounded-xl p-6 flex items-center justify-center">
+              <p className="text-sm text-muted-foreground">Aucune vente client</p>
+            </div>
+          )}
+        </div>
+        {!isPro && (
+          <button
+            onClick={() => setShowUpsell(true)}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <span className="px-4 py-2 rounded-xl bg-foreground text-background text-sm font-medium flex items-center gap-2">
+              <Crown className="size-4" />
+              Débloquer
+            </span>
+          </button>
+        )}
+      </section>
+
+      {/* Payment distribution donut (Pro section) */}
+      <section className="relative">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-semibold">Méthodes de paiement</h3>
+          {!isPro && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-foreground text-background">PRO</span>
+          )}
+        </div>
+        <div className={!isPro ? 'blur-sm pointer-events-none' : ''}>
+          <DonutChart
+            data={(data.payment_distribution || []).map(d => ({
+              label: d.method === 'cash' ? 'Cash' : d.method === 'wave' ? 'Wave' : 'Crédit',
+              value: d.amount,
+              color: d.method === 'cash' ? '#22c55e' : d.method === 'wave' ? '#3b82f6' : '#f97316',
+            }))}
+          />
+        </div>
+        {!isPro && (
+          <button
+            onClick={() => setShowUpsell(true)}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <span className="px-4 py-2 rounded-xl bg-foreground text-background text-sm font-medium flex items-center gap-2">
+              <Crown className="size-4" />
+              Débloquer
+            </span>
+          </button>
+        )}
+      </section>
+
       <section>
         <h3 className="text-sm font-semibold mb-2">Dettes totales</h3>
         <div className="glass rounded-xl px-4 py-4 flex items-center gap-3">
@@ -98,6 +221,42 @@ export default function DashboardPage() {
           </div>
         </div>
       </section>
+
+      {/* Export button (Pro only) */}
+      {isPro && (
+        <section>
+          <button
+            onClick={async () => {
+              try {
+                const res = await fetch('/api/export/csv', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ type: 'sales' }),
+                })
+                if (!res.ok) return
+                const blob = await res.blob()
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = `kivvi-ventes-${new Date().toISOString().slice(0, 10)}.csv`
+                a.click()
+                URL.revokeObjectURL(url)
+              } catch {}
+            }}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors"
+          >
+            <Download className="size-4" />
+            Exporter les ventes (CSV)
+          </button>
+        </section>
+      )}
+
+      <UpsellModal
+        open={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        type="feature"
+        featureName="Dashboard avancé"
+      />
     </div>
   )
 }

@@ -128,6 +128,9 @@ export interface DashboardData {
   debtor_count: number
   top_products: { name: string; count: number; revenue: number }[]
   daily_sales: { date: string; total: number; profit: number }[]
+  payment_distribution: { method: string; amount: number; count: number }[]
+  top_clients: { name: string; amount: number; count: number }[]
+  previous_period: { total_sales: number; profit: number } | null
 }
 
 export type Period = 'today' | 'week' | 'month'

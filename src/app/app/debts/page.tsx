@@ -3,14 +3,18 @@
 import { useState } from 'react'
 import { Inbox } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
+import { usePlan } from '@/hooks/use-plan'
 import { useClientsWithDebts } from '@/lib/db/hooks'
 import { formatCurrency } from '@/lib/carnet-constants'
 import { DebtClientCard } from '@/components/carnet/debt-client-card'
 import { DebtPaymentForm } from '@/components/carnet/debt-payment-form'
+import { UpsellModal } from '@/components/carnet/upsell-modal'
 
 export default function DebtsPage() {
   const { user } = useAuth()
   const clients = useClientsWithDebts(user?.id || '')
+  const { planStatus } = usePlan(user?.id)
+  const [showUpsell, setShowUpsell] = useState(false)
 
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [payingClient, setPayingClient] = useState<{
@@ -67,6 +71,8 @@ export default function DebtsPage() {
               name: client.name,
               totalDebt: client.total_debt,
             })}
+            userId={user?.id || ''}
+            onQuotaExceeded={() => setShowUpsell(true)}
           />
         ))}
       </div>
@@ -81,6 +87,16 @@ export default function DebtsPage() {
           onClose={() => setPayingClient(null)}
         />
       )}
+
+      <UpsellModal
+        open={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        type="reminders"
+        currentUsage={planStatus ? {
+          used: planStatus.remindersUsedToday,
+          limit: planStatus.effectiveReminderLimit === Infinity ? 999 : planStatus.effectiveReminderLimit,
+        } : undefined}
+      />
     </div>
   )
 }

@@ -4,9 +4,11 @@ import { useState, useMemo } from 'react'
 import { Search, Plus, Package, AlertTriangle } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { useProducts, useDeleteProduct } from '@/lib/db/hooks'
+import { usePlan } from '@/hooks/use-plan'
 import { formatCurrency } from '@/lib/carnet-constants'
 import { ProductCard } from '@/components/carnet/product-card'
 import { ProductForm } from '@/components/carnet/product-form'
+import { UpsellModal } from '@/components/carnet/upsell-modal'
 import type { LocalProduct } from '@/lib/db/index'
 
 export default function ProductsPage() {
@@ -18,6 +20,8 @@ export default function ProductsPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<LocalProduct | undefined>()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { canAddProduct, planStatus } = usePlan(user?.id)
+  const [showUpsell, setShowUpsell] = useState(false)
 
   const filtered = useMemo(() => {
     if (!products) return []
@@ -37,6 +41,10 @@ export default function ProductsPage() {
   }
 
   function handleAdd() {
+    if (!canAddProduct && planStatus) {
+      setShowUpsell(true)
+      return
+    }
     setEditingProduct(undefined)
     setFormOpen(true)
   }
@@ -186,6 +194,16 @@ export default function ProductsPage() {
           </div>
         </div>
       )}
+
+      <UpsellModal
+        open={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        type="products"
+        currentUsage={planStatus ? {
+          used: planStatus.productCount,
+          limit: planStatus.effectiveProductLimit === Infinity ? 999 : planStatus.effectiveProductLimit,
+        } : undefined}
+      />
     </>
   )
 }

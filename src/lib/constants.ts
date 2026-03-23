@@ -215,7 +215,7 @@ export const SAAS_PLANS: SaaSPlan[] = [
     ],
     highlighted: true,
     cta: 'Passer au Pro',
-    ctaHref: '/auth',
+    ctaHref: '/app/settings?upgrade=pro',
   },
   {
     name: 'Business',
@@ -233,7 +233,7 @@ export const SAAS_PLANS: SaaSPlan[] = [
     ],
     priceNote: 'Idéal pour 2+ points de vente',
     cta: 'Choisir Business',
-    ctaHref: '/auth',
+    ctaHref: '/app/settings?upgrade=business',
   },
 ]
 
