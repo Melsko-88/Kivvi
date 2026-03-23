@@ -29,6 +29,10 @@ export const metadata: Metadata = {
   description:
     'KIVVI conçoit des expériences digitales premium pour l\'Afrique. Sites web, applications mobiles, solutions sur mesure.',
   metadataBase: new URL('https://kivvi.tech'),
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/icons/icon-192.png',
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
